@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "jekyll/tailwindcss"
+require "jekyll-tailwindcss"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

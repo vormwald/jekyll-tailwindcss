@@ -1,11 +1,11 @@
 module Jekyll
   module Converters
-    class Tailwindcss< Converter
+    class Tailwindcss < Converter
       safe true
       priority :low
 
       def matches(ext)
-        ext =~ /^\.tailwindcss$/i
+        /^\.tailwindcss$/i.match?(ext)
       end
 
       def output_ext(ext)

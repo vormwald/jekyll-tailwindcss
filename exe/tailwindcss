@@ -13,6 +13,6 @@ begin
     exec(*command)
   end
 rescue Tailwindcss::Commands::UnsupportedPlatformException, Tailwindcss::Commands::ExecutableNotFoundException => e
-  STDERR.puts("ERROR: " + e.message)
+  warn("ERROR: " + e.message)
   exit 1
 end

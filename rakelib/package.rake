@@ -1,4 +1,3 @@
-# coding: utf-8
 #
 #  Rake tasks to manage native gem packages with binary executables from tailwindlabs/tailwindcss
 #
@@ -75,7 +74,7 @@ end
 JEKYLL_TAILWINDCSS_GEMSPEC = Bundler.load_gemspec("jekyll-tailwindcss.gemspec")
 
 # prepend the download task before the Gem::PackageTask tasks
-task :package => :download
+task package: :download
 
 gem_path = Gem::PackageTask.new(JEKYLL_TAILWINDCSS_GEMSPEC).define
 desc "Build the ruby gem"
@@ -104,11 +103,9 @@ Tailwindcss::Upstream::NATIVE_PLATFORMS.each do |platform, filename|
 
       # lazy, but fine for now.
       URI.open(release_url) do |remote|
-        File.open(exepath, "wb") do |local|
-          local.write(remote.read)
-        end
+        File.binwrite(exepath, remote.read)
       end
-      FileUtils.chmod(0755, exepath, verbose: true)
+      FileUtils.chmod(0o755, exepath, verbose: true)
     end
   end
 end

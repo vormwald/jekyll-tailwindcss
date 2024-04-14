@@ -3,10 +3,13 @@
 require "jekyll"
 require_relative "jekyll-tailwindcss/version"
 require_relative "jekyll/converters/tailwindcss"
+require_relative "tailwindcss/commands"
+require_relative "tailwindcss/upstream"
 
 module Jekyll
   module Tailwindcss
-    class Error < StandardError; end
-    # Your code goes here...
   end
+end
+
+module Tailwindcss
 end

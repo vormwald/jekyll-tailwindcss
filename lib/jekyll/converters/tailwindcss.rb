@@ -13,7 +13,12 @@ module Jekyll
       end
 
       def convert(content)
-        content
+        dev_mode = Jekyll.env == "development"
+        Jekyll.logger.info "Jekyll Tailwind:", "Generating #{dev_mode ? "" : "minified "}CSS"
+
+        compile_command = ::Tailwindcss::Commands.compile_command(debug: dev_mode).join(" ")
+
+        `#{compile_command}`
       end
     end
   end

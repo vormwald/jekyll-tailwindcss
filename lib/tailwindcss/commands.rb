@@ -76,8 +76,8 @@ module Tailwindcss
       def compile_command(debug: false, **kwargs)
         command = [
           executable(**kwargs),
-          "-i", "./_input.css",
-          "-c", "./tailwind.config.js"
+          "--input", "-",
+          "--config", "./tailwind.config.js"
         ]
 
         command << "--minify" unless debug

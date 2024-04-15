@@ -1,3 +1,5 @@
+require 'open3'
+
 module Jekyll
   module Converters
     class Tailwindcss < Converter
@@ -5,7 +7,7 @@ module Jekyll
       priority :low
 
       def matches(ext)
-        /^\.tailwindcss$/i.match?(ext)
+        /^\.tailwind(css)?$/i.match?(ext)
       end
 
       def output_ext(ext)
@@ -18,7 +20,24 @@ module Jekyll
 
         compile_command = ::Tailwindcss::Commands.compile_command(debug: dev_mode).join(" ")
 
-        `#{compile_command}`
+        output, error = nil
+        Open3.popen3(tailwindcss_env_options, compile_command) do |stdin, stdout, stderr, _wait_thread|
+          stdin.write content # write the content of *.tailwindcss to the tailwindcss CLI as input
+          stdin.close
+          error = stderr.read
+          output = stdout.read
+        end
+
+        Jekyll.logger.warn "Jekyll Tailwind:", error unless error.nil?
+        output
+      end
+
+      private
+
+      def tailwindcss_env_options
+        # Without this ENV you'll get a warning about `Browserslist: caniuse-lite is outdated`
+        # Since we're using the CLI, we can't update the data, so we ignore it.
+        {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"}
       end
     end
   end

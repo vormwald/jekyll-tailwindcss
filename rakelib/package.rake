@@ -1,3 +1,5 @@
+# NOTE: This file is taken verbatim from the https://github.com/rails/tailwindcss-rails/blob/main/rakelib/package.rake
+# I plan to tweak it as needed, but this is a good starting point.
 #
 #  Rake tasks to manage native gem packages with binary executables from tailwindlabs/tailwindcss
 #
@@ -101,8 +103,7 @@ Tailwindcss::Upstream::NATIVE_PLATFORMS.each do |platform, filename|
       release_url = tailwindcss_download_url(filename)
       warn "Downloading #{exepath} from #{release_url} ..."
 
-      # lazy, but fine for now.
-      URI.open(release_url) do |remote|
+      URI.parse(release_url).open do |remote|
         File.binwrite(exepath, remote.read)
       end
       FileUtils.chmod(0o755, exepath, verbose: true)
@@ -116,7 +117,7 @@ task "check" => exepaths do
   sha_url = tailwindcss_download_url(sha_filename)
   gemspec = JEKYLL_TAILWINDCSS_GEMSPEC
 
-  checksums = URI.open(sha_url).each_line.map do |line|
+  checksums = URI.parse(sha_url).open.each_line.map do |line|
     checksum, file = line.split
     [File.basename(file), checksum]
   end.to_h

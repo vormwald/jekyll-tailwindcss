@@ -10,18 +10,22 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
   end
 
   describe "#matches" do
-    it "matches .tailwindcss files" do
-      expect(converter.matches(".tailwindcss")).to be(true)
+    it "matches .css files" do
+      expect(converter.matches(".css")).to be(true)
     end
 
-    it "does not match non-.tailwindcss files" do
+    it "matches .CSS files because it is case insensitive" do
+      expect(converter.matches(".CSS")).to be(true)
+    end
+
+    it "does not match non-.css files" do
       expect(converter.matches(".html")).to be(false)
     end
   end
 
   describe "#output_ext" do
-    it "always outputs the .css file extension" do
-      expect(converter.output_ext("some-random-string")).to eql(".css")
+    it "always returns the extention passed in" do
+      expect(converter.output_ext(".CSS")).to eql(".CSS")
     end
   end
 
@@ -37,14 +41,17 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
     let(:error_message) { nil }
 
     let(:jekyll_env) { "development" }
-    let(:env_options) { { "BROWSERSLIST_IGNORE_OLD_DATA" => "1" } }
+    let(:env_options) { {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"} }
     let(:mock_stdin) { instance_double(IO).as_null_object }
     let(:mock_stdout) { instance_double(IO, read: css_content) }
     let(:mock_stderr) { instance_double(IO, read: error_message) }
 
     let(:compile_command_regex) { /tailwindcss --input - --config \.\/tailwind.config.js$/ }
+    let(:compile_arguments) { ["--input", "-", "--config", "./tailwind.config.js"] }
 
     before do
+      allow(::Tailwindcss::Commands).to receive(:compile_command).with(debug: true).and_return(["tailwindcss", *compile_arguments])
+      allow(::Tailwindcss::Commands).to receive(:compile_command).with(debug: false).and_return(["tailwindcss", *compile_arguments, "--minify"])
       allow(Jekyll).to receive(:env).and_return(jekyll_env)
       allow(Jekyll.logger).to receive(:info)
       allow(Open3).to receive(:popen3).with(env_options, compile_command_regex).and_yield(mock_stdin, mock_stdout, mock_stderr, nil)
@@ -81,6 +88,20 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
         expect(mock_stderr).to receive(:read)
 
         expect(converter.convert(tailwindcss_content)).to eq(css_content)
+      end
+    end
+
+    context "when the tailwindcss executable is not found" do
+      let(:error_message) { "Cannot find the tailwindcss executable..." }
+      before do
+        allow(::Tailwindcss::Commands).to receive(:compile_command)
+          .and_raise(::Tailwindcss::Commands::ExecutableNotFoundException, error_message)
+      end
+
+      it "logs error and returns original content" do
+        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", error_message)
+
+        expect(converter.convert(tailwindcss_content)).to eq(tailwindcss_content)
       end
     end
   end

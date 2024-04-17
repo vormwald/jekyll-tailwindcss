@@ -1,4 +1,4 @@
-require 'open3'
+require "open3"
 
 module Jekyll
   module Converters
@@ -7,14 +7,17 @@ module Jekyll
       priority :low
 
       def matches(ext)
-        /^\.tailwind(css)?$/i.match?(ext)
+        /^\.css$/i.match?(ext)
       end
 
       def output_ext(ext)
-        ".css"
+        # At this point, we will have a CSS file
+        ext
       end
 
       def convert(content)
+        return content unless /@tailwind/i.match?(content)
+
         dev_mode = Jekyll.env == "development"
         Jekyll.logger.info "Jekyll Tailwind:", "Generating #{dev_mode ? "" : "minified "}CSS"
 
@@ -27,9 +30,12 @@ module Jekyll
           error = stderr.read
           output = stdout.read
         end
-
         Jekyll.logger.warn "Jekyll Tailwind:", error unless error.nil?
+
         output
+      rescue => e
+        Jekyll.logger.error "Jekyll Tailwind:", e.message
+        content
       end
 
       private

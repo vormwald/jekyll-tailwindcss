@@ -102,6 +102,26 @@ Update `lib/tailwindcss/upstream.rb` with the upstream version.
 
 Run `bundle exec rake clobber` and then `bundle exec rake download` to ensure the tailwindcss binaries can be downloaded and you have the correct versions on the local disk.
 
+
+## Testing this gem
+
+### Running the test suite
+
+The unit tests are run with `bundle exec rspec`
+
+There is an additional integration test which runs in CI, `spec/integration/user_journey_test.sh` which you may also want to run.
+
+
+### Testing in a Jekyll project
+
+If you want to test modifications to this gem, you must run `rake download` once to download the upstream `tailwindcss` executables.
+
+Then you can point your Jekyll project's `Gemfile` at the local version of the gem as you normally would:
+
+``` ruby
+gem "jekyll-tailwindcss", path: "/path/to/jekyll-tailwindcss"
+```
+
 ### Cutting a release
 
 - bump the version

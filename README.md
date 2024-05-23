@@ -35,12 +35,12 @@ Tailwind will include the CSS for the classes found in `content` directories. Fo
 
 ```js
   content: [
-    "./_includes/**/*.{html,liquid}",
-    "./_layouts/**/*.{html,liquid}",
-    "./_pages/*.{html,liquid}",
-    "./_posts/**/*.md",
-    "./*.md",
-    "./*.html",
+    "./_drafts/**/*.md",
+    "./_includes/**/*.html",
+    "./_layouts/**/*.html",
+    "./_pages/*.{html,md}",
+    "./_posts/*.md",
+    "./*.{html,md}",
   ],
 ```
 
@@ -84,11 +84,10 @@ will be converted to
 /* _site/assets/css/styles.css */
 
 /*
- * Tailwind generated CSS
+ * Tailwind generated CSS 
+ * ...
  */
 ```
-
-
 
 ## Development
 

@@ -35,7 +35,7 @@ bundle install
 bundle show --paths
 
 # install tailwindcss config
-bundle exec tailwindcss init
+bundle exec jekyll-tailwindcss init
 
 # TEST: tailwind was installed correctly
 grep tailwind tailwind.config.js

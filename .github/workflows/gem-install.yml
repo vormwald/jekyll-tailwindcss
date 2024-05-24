@@ -25,6 +25,7 @@ jobs:
             "x64-mingw32",
             "x64-mingw-ucrt",
             "x86_64-darwin",
+            "arm64-darwin",
             "x86_64-linux",
             "arm-linux",
           ]
@@ -104,9 +105,9 @@ jobs:
               tailwindcss --help
             "
 
-  darwin-install:
+  darwin-x86_64-install:
     needs: ["package"]
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: ruby/setup-ruby@v1
         with:
@@ -114,6 +115,21 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: gem-x86_64-darwin
+          path: pkg
+      - run: "gem install pkg/jekyll-tailwindcss-*.gem"
+      - run: "tailwindcss --help"
+
+
+  darwin-arm64-install:
+    needs: ["package"]
+    runs-on: macos-14
+    steps:
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+      - uses: actions/download-artifact@v3
+        with:
+          name: gem-arm64-darwin
           path: pkg
       - run: "gem install pkg/jekyll-tailwindcss-*.gem"
       - run: "tailwindcss --help"

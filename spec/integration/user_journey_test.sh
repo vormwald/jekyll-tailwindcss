@@ -22,6 +22,9 @@ bundle exec jekyll -v
 bundle exec jekyll new test-site --skip-bundle
 pushd test-site
 
+# trying a fix from https://github.com/Maher4Ever/wdm/issues/27
+gem install wdm -- --with-cflags=-Wno-implicit-function-declaration
+
 # make sure to use the same version of jekyll
 bundle remove jekyll
 bundle add jekyll --skip-install

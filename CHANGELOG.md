@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.3.0] - 2024-06-09
+
+### Changed
+- Renamed the gems executable from `tailwindcss` to `jekyll-tailwindcss` to avoid conflicts with the `tailwindcss-rails` gem
+
+### Added
+- arm64-darwin platform support
+
 ## [0.2.0] - 2024-04-17
 
 ### Changed

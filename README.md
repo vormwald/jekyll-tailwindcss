@@ -2,7 +2,7 @@
 
 Bring the fun of building with TailwindCSS into your Jekyll project (without any JavaScript)
 
-**TL;DR** This gem borrows *heavily* from github.com/rails/tailwindcss-rails to provide platform-specific tailwind executables and provide a smooth developer experience in Jekyll projects
+**TL;DR** This gem borrows *heavily* from [tailwindcss-rails](https://github.com/rails/tailwindcss-rails) to provide platform-specific tailwind executables and provide a smooth developer experience in Jekyll projects
 
 Much like the Rails gem, this gem wraps [the standalone executable version](https://tailwindcss.com/blog/standalone-cli) of the Tailwind CSS v3 framework. It installs these as platform-specific executables, so there are separate underlying gems per platform, but the correct gem will automatically be picked for your platform.
 

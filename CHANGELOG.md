@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.3.1] - 2024-06-10
+
+### Changed
+* Update to [Tailwind CSS v3.4.12](https://github.com/tailwindlabs/tailwindcss/releases/tag/v3.4.12) 
+
+
 ## [0.3.0] - 2024-06-09
 
 ### Changed

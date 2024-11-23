@@ -1,7 +1,8 @@
 PATH
   remote: .
   specs:
-    jekyll-tailwindcss (0.3.0)
+    jekyll-tailwindcss (0.3.1)
+      tailwindcss-ruby
 
 GEM
   remote: https://rubygems.org/
@@ -29,6 +30,10 @@ GEM
     http_parser.rb (0.8.0)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
+    io-console (0.7.2)
+    irb (1.14.1)
+      rdoc (>= 4.0.0)
+      reline (>= 0.4.2)
     jekyll (4.3.4)
       addressable (~> 2.4)
       colorator (~> 1.0)
@@ -67,6 +72,8 @@ GEM
       racc
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
+    psych (5.2.0)
+      stringio
     public_suffix (6.0.1)
     racc (1.8.1)
     rainbow (3.1.1)
@@ -74,7 +81,11 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
+    rdoc (6.8.1)
+      psych (>= 4.0.0)
     regexp_parser (2.9.2)
+    reline (0.5.11)
+      io-console (~> 0.5)
     rexml (3.3.7)
     rouge (4.4.0)
     rspec (3.13.0)
@@ -125,6 +136,9 @@ GEM
     standard-performance (1.4.0)
       lint_roller (~> 1.1)
       rubocop-performance (~> 1.21.0)
+    stringio (3.1.2)
+    tailwindcss-ruby (3.4.15)
+    tailwindcss-ruby (3.4.15-x86_64-linux)
     terminal-table (3.0.2)
       unicode-display_width (>= 1.1.1, < 3)
     unicode-display_width (2.6.0)
@@ -135,6 +149,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  irb (~> 1.14)
   jekyll (~> 4.3)
   jekyll-tailwindcss!
   rake (~> 13.0)

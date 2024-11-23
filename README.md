@@ -4,8 +4,6 @@ Bring the fun of building with TailwindCSS into your Jekyll project (without any
 
 **TL;DR** This gem borrows *heavily* from [tailwindcss-rails](https://github.com/rails/tailwindcss-rails) to provide platform-specific tailwind executables and provide a smooth developer experience in Jekyll projects
 
-Much like the Rails gem, this gem wraps [the standalone executable version](https://tailwindcss.com/blog/standalone-cli) of the Tailwind CSS v3 framework. It installs these as platform-specific executables, so there are separate underlying gems per platform, but the correct gem will automatically be picked for your platform.
-
 > “Because building a great jekyll site shouldn’t require a `node_modules` folder
 
 ## Installation
@@ -91,25 +89,15 @@ will be converted to
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. 
 
 To install this gem on your local machine, run `bundle exec rake install`.
-
-### Updating to the latest upstream tailwindcss version
-
-Update `lib/tailwindcss/upstream.rb` with the upstream version.
-
-Run `bundle exec rake clobber` and then `bundle exec rake download` to ensure the tailwindcss binaries can be downloaded and you have the correct versions on the local disk.
-
 
 ## Testing this gem
 
 ### Running the test suite
 
 The unit tests are run with `bundle exec rspec`
-
-There is an additional integration test which runs in CI, `spec/integration/user_journey_test.sh` which you may also want to run.
-
 
 ### Testing in a Jekyll project
 
@@ -126,13 +114,11 @@ gem "jekyll-tailwindcss", path: "/path/to/jekyll-tailwindcss"
 - bump the version
   - [ ] update `lib/jekyll-tailwindcss/version.rb`
   - [ ] update `CHANGELOG.md`
-  - [ ] commit and create a git tag
-- build the native gems:
-  - [ ] `bundle exec rake clobber` to clean up possibly old tailwindcss executables
-  - [ ] `bundle exec rake package`
+  - [ ] commit and create a git tag ( example `git tag -a v0.3.1 -m "Release 0.3.1"` )
 - push
-  - [ ] `for g in pkg/*.gem ; do gem push $g ; done`
-  - [ ] `git push`
+  - [ ] `bundle exec rake build`
+  - [ ] `gem push pkg/*.gem`
+  - [ ] `git push --follow-tags`
 - announce
   - [ ] create a release at https://github.com/vormwald/jekyll-tailwindcss/releases
 

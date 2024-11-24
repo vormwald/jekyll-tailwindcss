@@ -29,6 +29,7 @@ jobs:
           ruby-version: ${{matrix.ruby}}
           bundler: latest
           bundler-cache: true
+          rubygems: latest
       - name: Run tests
         run: bundle exec rspec
       - name: run the linter

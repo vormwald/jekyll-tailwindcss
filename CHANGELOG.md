@@ -1,12 +1,10 @@
 ## [Unreleased]
 
-### Notable changes
 
+## [0.4.0] - 2024-11-23
+
+### Changed
 * The upstream `tailwindcss` executable has been extracted from this gem into a new dependency, `tailwindcss-ruby`.
-
-  In advance of the upcoming TailwindCSS v4 release, we are decoupling the `tailwindcss` executable
-  from the Rails integration. This will allow users to upgrade TailwindCSS at a time of their
-  choosing, and allow early adopters to start using the beta releases.
 
 ## [0.3.1] - 2024-06-10
 

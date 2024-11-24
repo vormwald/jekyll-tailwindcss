@@ -8,5 +8,3 @@
 
 # rspec failure tracking
 .rspec_status
-
-/exe/*/tailwindcss

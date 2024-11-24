@@ -90,19 +90,5 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
         expect(converter.convert(tailwindcss_content)).to eq(css_content)
       end
     end
-
-    context "when the tailwindcss executable is not found" do
-      let(:error_message) { "Cannot find the tailwindcss executable..." }
-      before do
-        allow(::Tailwindcss::Commands).to receive(:compile_command)
-          .and_raise(::Tailwindcss::Commands::ExecutableNotFoundException, error_message)
-      end
-
-      it "logs error and returns original content" do
-        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", error_message)
-
-        expect(converter.convert(tailwindcss_content)).to eq(tailwindcss_content)
-      end
-    end
   end
 end

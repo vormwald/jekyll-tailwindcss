@@ -8,7 +8,7 @@ RSpec.describe Tailwindcss::Commands do
 
   describe ".compile_command" do
     it "receives arguments" do
-      args = ["--input", "-", "--config", "./tailwind.config.js", "--minify"]
+      args = ["--input", "-", "--minify"]
 
       command_args = described_class.compile_command.slice(1...)
       expect(command_args).to eq(args)
@@ -28,6 +28,13 @@ RSpec.describe Tailwindcss::Commands do
         command_args = described_class.compile_command
         expect(command_args).to include("--postcss")
         expect(command_args).to include(postcss_path)
+      end
+    end
+
+    context "when config is passed" do
+      it "includes config param with the passed value" do
+        expect(described_class.compile_command(config: "other.config.js"))
+          .to include("--config", "other.config.js")
       end
     end
   end

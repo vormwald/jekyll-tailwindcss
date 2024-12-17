@@ -21,7 +21,9 @@ module Jekyll
         dev_mode = Jekyll.env == "development"
         Jekyll.logger.info "Jekyll Tailwind:", "Generating #{dev_mode ? "" : "minified "}CSS"
 
-        compile_command = ::Tailwindcss::Commands.compile_command(debug: dev_mode).join(" ")
+        compile_command = ::Tailwindcss::Commands
+          .compile_command(debug: dev_mode, config: config_location)
+          .join(" ")
 
         output, error = nil
         Open3.popen3(tailwindcss_env_options, compile_command) do |stdin, stdout, stderr, _wait_thread|
@@ -44,6 +46,10 @@ module Jekyll
         # Without this ENV you'll get a warning about `Browserslist: caniuse-lite is outdated`
         # Since we're using the CLI, we can't update the data, so we ignore it.
         {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"}
+      end
+
+      def config_location
+        @config.dig("tailwindcss", "config") || "./tailwind.config.js"
       end
     end
   end

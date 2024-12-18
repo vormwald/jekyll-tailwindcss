@@ -50,8 +50,8 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
     let(:compile_arguments) { ["--input", "-", "--config", "./tailwind.config.js"] }
 
     before do
-      allow(::Tailwindcss::Commands).to receive(:compile_command).with(debug: true).and_return(["tailwindcss", *compile_arguments])
-      allow(::Tailwindcss::Commands).to receive(:compile_command).with(debug: false).and_return(["tailwindcss", *compile_arguments, "--minify"])
+      allow(::Tailwindcss::Commands).to receive(:compile_command).with(debug: true, config: "./tailwind.config.js").and_return(["tailwindcss", *compile_arguments])
+      allow(::Tailwindcss::Commands).to receive(:compile_command).with(debug: false, config: "./tailwind.config.js").and_return(["tailwindcss", *compile_arguments, "--minify"])
       allow(Jekyll).to receive(:env).and_return(jekyll_env)
       allow(Jekyll.logger).to receive(:info)
       allow(Open3).to receive(:popen3).with(env_options, compile_command_regex).and_yield(mock_stdin, mock_stdout, mock_stderr, nil)
@@ -88,6 +88,22 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
         expect(mock_stderr).to receive(:read)
 
         expect(converter.convert(tailwindcss_content)).to eq(css_content)
+      end
+    end
+
+    context "when custom config location is specified" do
+      let(:compile_command_regex) { /--config other_location/ }
+
+      it "uses custom config location" do
+        converter.instance_variable_set(:@config, {
+          "tailwindcss" => {
+            "config" => "other_location"
+          }
+        })
+
+        allow(::Tailwindcss::Commands).to receive(:compile_command).with(debug: true, config: "other_location").and_return(["tailwindcss", "--input", "--config", "other_location"])
+
+        converter.convert(tailwindcss_content)
       end
     end
   end

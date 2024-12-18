@@ -3,12 +3,12 @@ require "tailwindcss/ruby"
 module Tailwindcss
   module Commands
     class << self
-      def compile_command(debug: false, **kwargs)
+      def compile_command(debug: false, config: nil, **kwargs)
         command = [
           Tailwindcss::Ruby.executable(**kwargs),
-          "--input", "-",
-          "--config", "./tailwind.config.js"
+          "--input", "-"
         ]
+        command += ["--config", config] if config
 
         command << "--minify" unless debug
 

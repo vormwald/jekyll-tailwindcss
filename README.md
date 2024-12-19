@@ -56,6 +56,15 @@ Any `*.css` file processed by jekyll [^1] that contains the `@tailwind` [directi
 
 [^1]: Jekyll will process any file that begins with yaml [frontmatter](https://jekyllrb.com/docs/front-matter/)
 
+### Configuration
+
+Location of the `tailwind.config.js` file can be configured in `_config.yml`:
+
+``` yaml
+tailwindcss:
+  config: './tailwind.config.js' # this is the default location
+```
+
 ### Examples
 
 

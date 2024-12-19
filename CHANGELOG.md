@@ -1,8 +1,12 @@
 ## [Unreleased]
 
-* Location of `tailwind.config.js` can be specified in `_config.yml`
+## [0.5.0]
 
-### Notable changes
+* Location of `tailwind.config.js` can be specified in `_config.yml` - #9 @imustafin 
+
+## [0.4.0] - 2024-11-23
+
+### Changed
 
 * The upstream `tailwindcss` executable has been extracted from this gem into a new dependency, `tailwindcss-ruby`.
 

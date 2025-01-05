@@ -29,8 +29,8 @@ module Jekyll
         Open3.popen3(tailwindcss_env_options, compile_command) do |stdin, stdout, stderr, _wait_thread|
           stdin.write content # write the content of *.tailwindcss to the tailwindcss CLI as input
           stdin.close
-          error = stderr.read
           output = stdout.read
+          error = stderr.read
         end
         Jekyll.logger.warn "Jekyll Tailwind:", error unless error.nil?
 

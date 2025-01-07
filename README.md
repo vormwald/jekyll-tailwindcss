@@ -126,7 +126,7 @@ gem "jekyll-tailwindcss", path: "/path/to/jekyll-tailwindcss"
   - [ ] commit and create a git tag ( example `git tag -a v0.3.1 -m "Release 0.3.1"` )
 - push
   - [ ] `bundle exec rake build`
-  - [ ] `gem push pkg/*.gem`
+  - [ ] `gem push pkg/jekyll-tailwind-[NEW_VERSION].gem
   - [ ] `git push --follow-tags`
 - announce
   - [ ] create a release at https://github.com/vormwald/jekyll-tailwindcss/releases

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jekyll-tailwindcss (0.5.0)
+    jekyll-tailwindcss (0.5.1)
       tailwindcss-ruby
 
 GEM
@@ -19,12 +19,8 @@ GEM
       http_parser.rb (~> 0)
     eventmachine (1.2.7)
     ffi (1.17.0)
-    ffi (1.17.0-x86_64-linux-gnu)
     forwardable-extended (2.6.0)
     google-protobuf (4.28.3)
-      bigdecimal
-      rake (>= 13)
-    google-protobuf (4.28.3-x86_64-linux)
       bigdecimal
       rake (>= 13)
     http_parser.rb (0.8.0)

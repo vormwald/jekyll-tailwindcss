@@ -1,8 +1,12 @@
 ## [Unreleased]
 
+## [0.5.1]
+
+* Fix a potential bug that would hang on large tailwind files - [#13](https://github.com/vormwald/jekyll-tailwindcss/pull/13) @marckohlbrugge
+
 ## [0.5.0]
 
-* Location of `tailwind.config.js` can be specified in `_config.yml` - #9 @imustafin 
+* Location of `tailwind.config.js` can be specified in `_config.yml` - [#9](https://github.com/vormwald/jekyll-tailwindcss/pull/9) @imustafin 
 
 ## [0.4.0] - 2024-11-23
 

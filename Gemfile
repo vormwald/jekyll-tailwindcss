@@ -10,4 +10,10 @@ gem "jekyll", "~> 4.3"
 gem "rspec", "~> 3.0"
 gem "standard", "~> 1.3"
 
-gem "irb", "~> 1.14"
+# needed as a jekyll dependency since ruby 3.4 removed them
+gem "csv" 
+gem "base64"
+
+group :development, :test do
+  gem "irb", "~> 1.14"
+end

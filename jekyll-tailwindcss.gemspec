@@ -14,7 +14,6 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.files = Dir["{app,lib}/**/*", "LICENSE", "Rakefile", "README.md"]
   spec.bindir = "exe"
-  spec.executables << "jekyll-tailwindcss"
   spec.require_paths = ["lib"]
   spec.add_dependency "tailwindcss-ruby"
 end

@@ -16,13 +16,17 @@ module Jekyll
       end
 
       def convert(content)
-        return content unless /@tailwind/i.match?(content)
+        return content unless /@tailwind|@import ['"]tailwindcss['"]/i.match?(content)
+        if content.include?("@tailwind") && config_path.nil?
+          Jekyll.logger.error "Jekyll Tailwind:", "to use tailwind v3 you need to include a config path in _config.yml"
+          return content
+        end
 
         dev_mode = Jekyll.env == "development"
         Jekyll.logger.info "Jekyll Tailwind:", "Generating #{dev_mode ? "" : "minified "}CSS"
 
         compile_command = ::Tailwindcss::Commands
-          .compile_command(debug: dev_mode, config: config_location)
+          .compile_command(debug: dev_mode, config_path: config_path, postcss_path: postcss_path)
           .join(" ")
 
         output, error = nil
@@ -48,8 +52,12 @@ module Jekyll
         {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"}
       end
 
-      def config_location
-        @config.dig("tailwindcss", "config") || "./tailwind.config.js"
+      def config_path
+        @config.dig("tailwindcss", "config")
+      end
+
+      def postcss_path
+        @config.dig("tailwindcss", "postcss")
       end
     end
   end

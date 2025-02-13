@@ -59,8 +59,9 @@ tailwindcss:
 Tailwind will generate CSS for the classes found in `content` directories. For most jekyll sites, this would work well.
 
 ```js
-  // ./tailwind.config.js
-  // ...
+// ./tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     "./_drafts/**/*.md",
     "./_includes/**/*.html",
@@ -70,6 +71,7 @@ Tailwind will generate CSS for the classes found in `content` directories. For m
     "./*.{html,md}",
   ],
   // ...
+};
 ```
 
 Learn more at https://v3.tailwindcss.com/docs/configuration

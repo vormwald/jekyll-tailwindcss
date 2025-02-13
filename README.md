@@ -78,7 +78,7 @@ Learn more at https://v3.tailwindcss.com/docs/configuration
 
 ## Example CSS
 
-Any CSS file with frontmatter and `@tailwind` directives will be converted to a
+Any CSS file with frontmatter and `@tailwind` directives will be converted.
 
 ```css
 /* assets/css/styles.css */
@@ -131,6 +131,42 @@ bundle exec jekyll serve # or build
 Any `*.css` file processed by jekyll [^1] that contains the `@import "tailwindcss";` [directive](https://tailwindcss.com/docs/functions-and-directives#config) will be converted through the Tailwind CLI.
 
 [^1]: Jekyll will process any file that begins with yaml [frontmatter](https://jekyllrb.com/docs/front-matter/)
+
+### Example
+Any CSS file with frontmatter and `@import "tailwindcss";` will be converted.
+
+Your CSS file
+
+```css
+/* assets/css/styles.css */
+---
+# This yaml frontmatter is required for jekyll to process the file
+---
+
+@import "tailwindcss";
+
+.btn {
+  @apply rounded border border-gray-300;
+}
+```
+
+will be converted to
+
+```css
+/* _site/assets/css/styles.css */
+
+/*
+ * Tailwind generated CSS 
+ * ...
+  .btn {
+    border-radius: 0.25rem;
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-gray-300);
+  }
+ * ...
+ */
+```
 
 ### Minification
 

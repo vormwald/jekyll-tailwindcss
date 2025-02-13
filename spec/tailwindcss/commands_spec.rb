@@ -23,9 +23,8 @@ RSpec.describe Tailwindcss::Commands do
     context "when postcss.config.js exists" do
       it "includes postcss configuration" do
         postcss_path = "postcss.config.js"
-        allow(File).to receive(:exist?).with(postcss_path).and_return(true)
 
-        command_args = described_class.compile_command
+        command_args = described_class.compile_command(postcss_path: postcss_path)
         expect(command_args).to include("--postcss")
         expect(command_args).to include(postcss_path)
       end
@@ -33,7 +32,7 @@ RSpec.describe Tailwindcss::Commands do
 
     context "when config is passed" do
       it "includes config param with the passed value" do
-        expect(described_class.compile_command(config: "other.config.js"))
+        expect(described_class.compile_command(config_path: "other.config.js"))
           .to include("--config", "other.config.js")
       end
     end

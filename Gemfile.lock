@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jekyll-tailwindcss (0.5.1)
+    jekyll-tailwindcss (0.6.1)
       tailwindcss-ruby
 
 GEM

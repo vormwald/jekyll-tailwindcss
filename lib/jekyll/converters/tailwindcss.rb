@@ -16,7 +16,7 @@ module Jekyll
       end
 
       def convert(content)
-        return content unless /@tailwind|@import ['"]tailwindcss['"]/i.match?(content)
+        return content unless /@tailwind|@import ['"]tailwindcss/i.match?(content)
         if content.include?("@tailwind") && config_path.nil?
           Jekyll.logger.error "Jekyll Tailwind:", "to use tailwind v3 you need to include a config path in _config.yml"
           return content

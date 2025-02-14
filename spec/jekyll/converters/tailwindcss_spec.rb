@@ -67,6 +67,27 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
       end
     end
 
+    context "When skipping preflight" do
+      # https://tailwindcss.com/docs/preflight#disabling-preflight
+      let(:tailwindcss_content) do
+        <<~TAILWINDCSS
+          @layer theme, base, components, utilities;
+          @import "tailwindcss/theme.css" layer(theme);
+          @import "tailwindcss/utilities.css" layer(utilities);
+        TAILWINDCSS
+      end
+
+      it "calls the tailwind CLI" do
+        expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
+        expect(Jekyll.logger).not_to receive(:warn)
+        expect(mock_stdin).to receive(:write).with(tailwindcss_content)
+        expect(mock_stdout).to receive(:read)
+        expect(mock_stderr).to receive(:read)
+
+        expect(converter.convert(tailwindcss_content)).to eq(css_content)
+      end
+    end
+
     context "when using TailwindCSS v3" do
       let(:tailwindcss_content) do
         <<~TAILWINDCSS

@@ -17,7 +17,7 @@ module Jekyll
 
       def convert(content)
         return content unless /@tailwind|@import ['"]tailwindcss/i.match?(content)
-        if content.include?("@tailwind") && config_path.nil?
+        if config_path.nil? && tailwind_v3_syntax?(content)
           Jekyll.logger.error "Jekyll Tailwind:", "to use tailwind v3 you need to include a config path in _config.yml"
           return content
         end
@@ -45,6 +45,12 @@ module Jekyll
       end
 
       private
+
+      def tailwind_v3_syntax?(content)
+        return false if content.include?("@plugin")
+
+        content.include?("@tailwind")
+      end
 
       def tailwindcss_env_options
         # Without this ENV you'll get a warning about `Browserslist: caniuse-lite is outdated`

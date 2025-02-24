@@ -88,6 +88,24 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
       end
     end
 
+    context "when using official plugins" do
+      let(:tailwindcss_content) do
+        # Example installation configuration for
+        # https://github.com/tailwindlabs/tailwindcss-typography
+        <<~TAILWINDCSS
+          @import "tailwindcss";
+          @plugin "@tailwindcss/typography";
+        TAILWINDCSS
+      end
+
+      it "does not produce errors" do
+        expect(Jekyll.logger).not_to receive(:error).with("Jekyll Tailwind:", /v3/)
+        expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
+
+        converter.convert(tailwindcss_content)
+      end
+    end
+
     context "when using TailwindCSS v3" do
       let(:tailwindcss_content) do
         <<~TAILWINDCSS

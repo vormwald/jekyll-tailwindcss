@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.6.2] - 2025-02-28
+
 - Support importing official plugins in CSS for v4 [#22](https://github.com/vormwald/jekyll-tailwindcss/pull/22) @imustafin
 
 ## [0.6.1] - 2025-02-13

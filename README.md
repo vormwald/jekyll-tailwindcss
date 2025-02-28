@@ -202,6 +202,7 @@ end
 - bump the version
   - [ ] update `lib/jekyll-tailwindcss/version.rb`
   - [ ] update `CHANGELOG.md`
+  - [ ] bundle install to pick up the new version
   - [ ] commit and create a git tag ( example `git tag -a v0.3.1 -m "Release 0.3.1"` )
 - push
   - [ ] `bundle exec rake build`

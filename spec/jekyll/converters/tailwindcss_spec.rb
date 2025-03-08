@@ -47,7 +47,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
     let(:mock_stdout) { instance_double(IO, read: css_content) }
     let(:mock_stderr) { instance_double(IO, read: error_message) }
 
-    let(:compile_command_regex) { /.+\/tailwindcss --input -$/ }
+    let(:compile_command_regex) { /.+\/tailwindcss"? --input -$/ }
     let(:compile_arguments) { ["--input", "-"] }
 
     before do
@@ -121,7 +121,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
           }
         }
       end
-      let(:compile_command_regex) { /.+\/tailwindcss --input - --config tailwind.config.js$/ }
+      let(:compile_command_regex) { /.+\/tailwindcss"? --input - --config tailwind.config.js$/ }
       let(:compile_arguments) { ["--input", "-", "--config", "./tailwind.config.js"] }
 
       it "calls the tailwindcss CLI" do
@@ -150,7 +150,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
             }
           }
         end
-        let(:compile_command_regex) { /.+\/tailwindcss --input - --config other_location$/ }
+        let(:compile_command_regex) { /.+\/tailwindcss"? --input - --config other_location$/ }
         let(:compile_arguments) { ["--input", "-", "--config", "./other_location"] }
 
         it "uses custom config location" do

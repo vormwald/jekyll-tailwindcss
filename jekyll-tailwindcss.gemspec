@@ -16,4 +16,5 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.require_paths = ["lib"]
   spec.add_dependency "tailwindcss-ruby"
+  spec.add_dependency "os"
 end

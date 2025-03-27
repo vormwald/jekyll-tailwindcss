@@ -2,7 +2,7 @@
 
 require "jekyll"
 require_relative "jekyll-tailwindcss/version"
-require_relative "jekyll/converters/tailwindcss"
+require_relative "jekyll/converters/css"
 require_relative "tailwindcss/commands"
 
 module Jekyll

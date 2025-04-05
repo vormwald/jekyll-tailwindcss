@@ -5,7 +5,7 @@ module Tailwindcss
     class << self
       def compile_command(debug: false, config_path: nil, postcss_path: nil, **kwargs)
         command = [
-          Tailwindcss::Ruby.executable(**kwargs),
+          "#{Tailwindcss::Ruby.executable(**kwargs)}",
           "--input", "-"
         ]
         command += ["--config", config_path] if config_path

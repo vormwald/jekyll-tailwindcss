@@ -2,7 +2,7 @@ require "open3"
 
 module Jekyll
   module Converters
-    class Tailwindcss < Converter
+    class Css < Converter
       safe true
       priority :low
 

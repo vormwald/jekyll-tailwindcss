@@ -8,17 +8,22 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
   end
   let(:plugin_config) { {} }
 
+  before do
+    allow(Jekyll.logger).to receive(:info)
+    allow(Jekyll.logger).to receive(:warn)
+  end
+
   it "has a version number" do
     expect(Jekyll::Tailwindcss::VERSION).not_to be nil
   end
 
   describe "#matches" do
-    it "matches .css files" do
-      expect(converter.matches(".css")).to be(true)
+    it "matches .tailwind files" do
+      expect(converter.matches(".tailwind")).to be(true)
     end
 
-    it "matches .CSS files because it is case insensitive" do
-      expect(converter.matches(".CSS")).to be(true)
+    it "matches .tailwindcss files" do
+      expect(converter.matches(".tailwindcss")).to be(true)
     end
 
     it "does not match non-.css files" do
@@ -28,23 +33,20 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
   describe "#output_ext" do
     it "always returns the extention passed in" do
-      expect(converter.output_ext(".CSS")).to eql(".CSS")
+      expect(converter.output_ext(".TailwindCSS")).to eql(".css")
     end
   end
 
   describe "#convert" do
-    let(:tailwindcss_content) do
-      <<~TAILWINDCSS
-        @import "tailwindcss";
-      TAILWINDCSS
-    end
-    let(:css_content) { "body { color: red; }" }
+    let(:css_path) { "./_tailwind.css" }
+    let(:tailwind_input) { "@import '#{css_path}';" }
+    let(:tailwind_output) { "body { color: red; }" }
     let(:error_message) { nil }
+    let(:ignored_content_input) { "This is ignored" }
 
     let(:jekyll_env) { "development" }
-    let(:env_options) { {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"} }
     let(:mock_stdin) { instance_double(IO).as_null_object }
-    let(:mock_stdout) { instance_double(IO, read: css_content) }
+    let(:mock_stdout) { instance_double(IO, read: tailwind_output) }
     let(:mock_stderr) { instance_double(IO, read: error_message) }
 
     let(:compile_command_regex) { /.+\/tailwindcss --input -$/ }
@@ -52,116 +54,62 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
     before do
       allow(Jekyll).to receive(:env).and_return(jekyll_env)
-      allow(Open3).to receive(:popen3).with(env_options, compile_command_regex).and_yield(mock_stdin, mock_stdout, mock_stderr, nil)
+      allow(Open3).to receive(:popen3).with(compile_command_regex).and_yield(mock_stdin, mock_stdout, mock_stderr, nil)
     end
 
     context "using defaults" do
       it "calls the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
         expect(Jekyll.logger).not_to receive(:warn)
-        expect(mock_stdin).to receive(:write).with(tailwindcss_content)
+        expect(mock_stdin).to receive(:write).with(tailwind_input)
         expect(mock_stdout).to receive(:read)
         expect(mock_stderr).to receive(:read)
 
-        expect(converter.convert(tailwindcss_content)).to eq(css_content)
+        expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
       end
     end
 
-    context "When skipping preflight" do
-      # https://tailwindcss.com/docs/preflight#disabling-preflight
-      let(:tailwindcss_content) do
-        <<~TAILWINDCSS
-          @layer theme, base, components, utilities;
-          @import "tailwindcss/theme.css" layer(theme);
-          @import "tailwindcss/utilities.css" layer(utilities);
-        TAILWINDCSS
+    context "when using a non-default tailwind.css location" do
+      let(:plugin_config) do
+        {
+          "tailwindcss" => {
+            "css_path" => "_data/other_tailwind_file.css"
+          }
+        }
       end
+      let(:tailwind_input) { "@import '_data/other_tailwind_file.css';" }
 
-      it "calls the tailwind CLI" do
+      it "passes the config path to the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
         expect(Jekyll.logger).not_to receive(:warn)
-        expect(mock_stdin).to receive(:write).with(tailwindcss_content)
+        expect(mock_stdin).to receive(:write).with(tailwind_input)
         expect(mock_stdout).to receive(:read)
         expect(mock_stderr).to receive(:read)
 
-        expect(converter.convert(tailwindcss_content)).to eq(css_content)
-      end
-    end
-
-    context "when using official plugins" do
-      let(:tailwindcss_content) do
-        # Example installation configuration for
-        # https://github.com/tailwindlabs/tailwindcss-typography
-        <<~TAILWINDCSS
-          @import "tailwindcss";
-          @plugin "@tailwindcss/typography";
-        TAILWINDCSS
-      end
-
-      it "does not produce errors" do
-        expect(Jekyll.logger).not_to receive(:error).with("Jekyll Tailwind:", /v3/)
-        expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-
-        converter.convert(tailwindcss_content)
+        expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
       end
     end
 
     context "when using TailwindCSS v3" do
-      let(:tailwindcss_content) do
-        <<~TAILWINDCSS
-          @tailwind base;
-          @tailwind components;
-          @tailwind utilities;
-        TAILWINDCSS
-      end
-      let(:plugin_config) do
-        {
-          "tailwindcss" => {
-            "config" => "tailwind.config.js"
-          }
-        }
-      end
-      let(:compile_command_regex) { /.+\/tailwindcss --input - --config tailwind.config.js$/ }
-      let(:compile_arguments) { ["--input", "-", "--config", "./tailwind.config.js"] }
-
-      it "calls the tailwindcss CLI" do
-        expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-        expect(Jekyll.logger).not_to receive(:warn)
-        expect(mock_stdin).to receive(:write).with(tailwindcss_content)
-        expect(mock_stdout).to receive(:read)
-        expect(mock_stderr).to receive(:read)
-
-        expect(converter.convert(tailwindcss_content)).to eq(css_content)
+      let(:tailwindcss_ruby_version) { Gem::Version.new("3.4.1") }
+      let(:tailwindcss_ruby_stub) do
+        instance_double(Bundler::StubSpecification,
+          version: tailwindcss_ruby_version)
       end
 
-      context "when no config path is specified" do
-        let(:plugin_config) { {} }
-        it "logs an error" do
-          expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", "to use tailwind v3 you need to include a config path in _config.yml")
-          converter.convert(tailwindcss_content)
-        end
+      before do
+        allow(Gem).to receive(:loaded_specs)
+          .and_return({"tailwindcss-ruby" => tailwindcss_ruby_stub})
       end
 
-      context "when custom config location is specified" do
-        let(:plugin_config) do
-          {
-            "tailwindcss" => {
-              "config" => "other_location"
-            }
-          }
-        end
-        let(:compile_command_regex) { /.+\/tailwindcss --input - --config other_location$/ }
-        let(:compile_arguments) { ["--input", "-", "--config", "./other_location"] }
+      it "calls prints a helpful message, does not convert" do
+        expect(Jekyll.logger).to receive(:warn).with("Jekyll Tailwind:",
+          "You're using a .tailwindcss file extension, but your tailwindcss-ruby gem is below version 4.0.")
+        expect(mock_stdin).not_to receive(:write)
+        expect(mock_stdout).not_to receive(:read)
+        expect(mock_stderr).not_to receive(:read)
 
-        it "uses custom config location" do
-          converter.instance_variable_set(:@config, {
-            "tailwindcss" => {
-              "config" => "other_location"
-            }
-          })
-
-          converter.convert(tailwindcss_content)
-        end
+        expect(converter.convert(ignored_content_input)).to be_nil
       end
     end
 
@@ -171,7 +119,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
       it "includes the --minify option" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating minified CSS")
-        expect(converter.convert(tailwindcss_content)).to eq(css_content)
+        expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
       end
     end
 
@@ -183,7 +131,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
         expect(mock_stdout).to receive(:read)
         expect(mock_stderr).to receive(:read)
 
-        expect(converter.convert(tailwindcss_content)).to eq(css_content)
+        expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
       end
     end
   end

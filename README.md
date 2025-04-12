@@ -125,6 +125,8 @@ tailwindcss:
 
 ## Usage
 
+> See an example repo at https://github.com/vormwald/jekyll-blahg
+
 ### Setup
 You'll need 2 files to make this work:
 

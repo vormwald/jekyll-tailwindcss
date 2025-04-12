@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.7.0] - 2025-04-12
+- Added a new (and better) way to organize your project with _tailwind.css and styles.tailwindcss files [#26](https://github.com/vormwald/jekyll-tailwindcss/pull/26) 
+
 ## [0.6.2] - 2025-02-28
 
 - Support importing official plugins in CSS for v4 [#22](https://github.com/vormwald/jekyll-tailwindcss/pull/22) @imustafin

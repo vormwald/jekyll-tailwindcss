@@ -5,33 +5,33 @@ module Jekyll
     class Tailwindcss < Converter
       safe true
       priority :low
+      EXTENSION_PATTERN = %r{^\.tailwind(css)?$}i
 
       def matches(ext)
-        /^\.css$/i.match?(ext)
+        EXTENSION_PATTERN.match? ext
       end
 
       def output_ext(ext)
-        # At this point, we will have a CSS file
-        ext
+        ".css"
       end
 
       def convert(content)
-        return content unless /@tailwind|@import ['"]tailwindcss/i.match?(content)
-        if config_path.nil? && tailwind_v3_syntax?(content)
-          Jekyll.logger.error "Jekyll Tailwind:", "to use tailwind v3 you need to include a config path in _config.yml"
-          return content
+        unless valid_tailwindcss_gem_version?
+          print_tailwind_v3_warning
+
+          return
         end
 
         dev_mode = Jekyll.env == "development"
         Jekyll.logger.info "Jekyll Tailwind:", "Generating #{dev_mode ? "" : "minified "}CSS"
 
         compile_command = ::Tailwindcss::Commands
-          .compile_command(debug: dev_mode, config_path: config_path, postcss_path: postcss_path)
+          .compile_command(debug: dev_mode)
           .join(" ")
 
         output, error = nil
-        Open3.popen3(tailwindcss_env_options, compile_command) do |stdin, stdout, stderr, _wait_thread|
-          stdin.write content # write the content of *.tailwindcss to the tailwindcss CLI as input
+        Open3.popen3(compile_command) do |stdin, stdout, stderr, _wait_thread|
+          stdin.write tailwind_content
           stdin.close
           output = stdout.read
           error = stderr.read
@@ -46,24 +46,30 @@ module Jekyll
 
       private
 
-      def tailwind_v3_syntax?(content)
-        return false if content.include?("@plugin")
-
-        content.include?("@tailwind")
+      def tailwind_content
+        "@import '#{tailwind_css_path}';"
       end
 
-      def tailwindcss_env_options
-        # Without this ENV you'll get a warning about `Browserslist: caniuse-lite is outdated`
-        # Since we're using the CLI, we can't update the data, so we ignore it.
-        {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"}
+      def tailwind_css_path
+        @config.dig("tailwindcss", "css_path") || "./_tailwind.css"
       end
 
-      def config_path
-        @config.dig("tailwindcss", "config")
+      def valid_tailwindcss_gem_version?
+        gem_spec = Gem.loaded_specs["tailwindcss-ruby"]
+        return false unless gem_spec
+
+        Gem::Version.new(gem_spec.version) >= Gem::Version.new("4.0.0")
+      rescue
+        # If anything goes wrong (gem not found, version format issues, etc.)
+        false
       end
 
-      def postcss_path
-        @config.dig("tailwindcss", "postcss")
+      def print_tailwind_v3_warning
+        Jekyll.logger.warn "Jekyll Tailwind:", "You're using a .tailwindcss file extension, but your tailwindcss-ruby gem is below version 4.0."
+        Jekyll.logger.warn "Jekyll Tailwind:", "The .tailwindcss extension is only supported in v4.0.0 and above."
+        Jekyll.logger.warn "Jekyll Tailwind:", "Please either:"
+        Jekyll.logger.warn "Jekyll Tailwind:", "  - Upgrade with: bundle update tailwindcss-ruby"
+        Jekyll.logger.warn "Jekyll Tailwind:", "  - Rename your file to use .css extension with @import \"tailwindcss\" syntax"
       end
     end
   end

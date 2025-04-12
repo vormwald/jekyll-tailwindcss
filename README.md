@@ -1,20 +1,15 @@
 # Jekyll::Tailwindcss
 
-Bring the fun of building with TailwindCSS into your Jekyll project (without any JavaScript)
+Bring the joy of building with TailwindCSS into your Jekyll project (without any JavaScript)
 
-**TL;DR** This gem borrows _heavily_ from [tailwindcss-rails](https://github.com/rails/tailwindcss-rails) to provide platform-specific tailwind executables and provide a smooth developer experience in Jekyll projects
+**TL;DR** This gem uses [tailwindcss-ruby](https://github.com/rails/tailwindcss-ruby) to provide platform-specific tailwind executables and enables a smooth developer experience in Jekyll projects
 
-> _"Because building a great jekyll site shouldn't require a `node_modules` folder"_
+> _"Because building a great Jekyll site shouldn't require a `node_modules` folder"_
+
 
 ## Installation
 
-Install the gem in your jekyll project's Gemfile by executing the following:
-
-```
-bundle add jekyll-tailwindcss --group jekyll_plugins
-```
-
-Or by adding the gem manually
+Add the gem to your Jekyll project's Gemfile
 
 ```ruby
 # Gemfile
@@ -25,10 +20,12 @@ group :jekyll_plugins do
 end
 ```
 
-> [!NOTE]
-> By adding this gem to the jekyll_plugins group, you don't need to explicitly configure it in `_config.yml`.
+Run `bundle install`
 
-### Choosing a specific version of tailwindcss
+> [!TIP]
+> By adding this gem to the `:jekyll_plugins` group, you don't need to explicitly configure it in `_config.yml`.
+
+### Optional: Choosing a specific version of tailwindcss
 
 This gem uses the latest TailwindCSS by default. However since CLI versions are managed by the `tailwindcss-ruby` gem, it supports older versions as well.
 
@@ -56,7 +53,7 @@ tailwindcss:
   config: "./tailwind.config.js"
 ```
 
-Tailwind will generate CSS for the classes found in `content` directories. For most jekyll sites, this would work well.
+Tailwind will generate CSS for the classes found in `content` directories. For most Jekyll sites, this would work well.
 
 ```js
 // ./tailwind.config.js
@@ -83,7 +80,7 @@ Any CSS file with frontmatter and `@tailwind` directives will be converted.
 ```css
 /* assets/css/styles.css */
 ---
-# This yaml frontmatter is required for jekyll to process the file
+# This yaml frontmatter is required for Jekyll to process the file
 ---
 
 @tailwind base;
@@ -101,14 +98,21 @@ will be converted to
 /* _site/assets/css/styles.css */
 
 /*
- * Tailwind generated CSS 
+ * Tailwind generated CSS
  * ...
  */
 ```
 
 ### PostCSS Support
 
-This gem includes basic PostCSS support. If a `postcss.config.js` file is included in your `_config.yml`, the Tailwind CLI will be invoked with the `--postcss` flag.
+> [!WARNING]
+> PostCSS configuration is considered an advanced use case and is outside the scope of this gem.
+> It is possible that support be removed in future versions of this gem. If needed, you should look to run your Tailwind builds with node.
+
+That said... This gem includes basic PostCSS support. If a `postcss.config.js` file is included in your `_config.yml`, the Tailwind CLI will be invoked with the `--postcss` flag.
+
+Users should verify their PostCSS setup outside this gem by running:
+ `bundle exec tailwindcss --postcss postcss.config.js`
 
 ```yaml
 tailwindcss:
@@ -116,57 +120,58 @@ tailwindcss:
   postcss: "./postcss.config.js" # OPTIONAL, only if you have a postcss config file
 ```
 
-> [!NOTE]
-> PostCSS configuration is considered an advanced use case and is outside the scope of this gem. Users should verify their PostCSS setup outside this gem by running:
-> `bundle exec tailwindcss --postcss postcss.config.js`
 
 </details>
 
 ## Usage
 
-```sh
-bundle exec jekyll serve # or build
-```
+### Setup
+You'll need 2 files to make this work:
 
-Any `*.css` file processed by jekyll [^1] that contains the `@import "tailwindcss";` [directive](https://tailwindcss.com/docs/functions-and-directives#config) will be converted through the Tailwind CLI.
+**File 1: `./_tailwind.css`**
 
-[^1]: Jekyll will process any file that begins with yaml [frontmatter](https://jekyllrb.com/docs/front-matter/)
-
-### Example
-Any CSS file with frontmatter and `@import "tailwindcss";` will be converted.
-
-Your CSS file
+This file acts as your tailwind configuration file. Import "tailwindcss" and any custom CSS here.
 
 ```css
-/* assets/css/styles.css */
----
-# This yaml frontmatter is required for jekyll to process the file
----
-
 @import "tailwindcss";
 
-.btn {
-  @apply rounded border border-gray-300;
-}
+/* ... any other imports or css classes */
 ```
 
-will be converted to
 
-```css
-/* _site/assets/css/styles.css */
+**File 2: `./assets/css/styles.tailwindcss`**
 
-/*
- * Tailwind generated CSS 
- * ...
-  .btn {
-    border-radius: 0.25rem;
-    border-style: var(--tw-border-style);
-    border-width: 1px;
-    border-color: var(--color-gray-300);
-  }
- * ...
- */
+Place this file wherever you'd like your site's tailwind CLI generated content to go: `assets/css/your_css_file.tailwindcss` -> `__site/assets/css/your_css_file.css`
+
+It must contain yaml frontmatter to be processed by Jekyll [^1]
+
+```yaml
+---
+# This file will be converted to __site/assets/css/styles.css
+---
+This file is just a placeholder. It's content will be replaced by output from the tailwindcss CLI.
 ```
+
+> [!NOTE]
+> Why the 2 files?
+>
+> This is a compromise to allow the [TailwindCSS intellisense](https://tailwindcss.com/docs/editor-setup#intellisense-for-vs-code) plugin to work. (It cannot parse a CSS file with frontmatter, so we keep it seperate)
+>
+> The `_tailwind.css` file serves as the tailwindcss config file.
+> If you'd rather set keep this file somewhere else, you can do so by setting the `tailwindcss.config_file` option in `_config.yml`:
+>
+> ```yaml
+> tailwindcss:
+>   config_file: ./_data/tailwind.css
+> ```
+
+### Building the Jekyll site
+
+```sh
+bundle exec jekyll serve
+```
+[^1]: Jekyll will process any file that begins with yaml [frontmatter](https://jekyllrb.com/docs/front-matter/)
+
 
 ### Minification
 

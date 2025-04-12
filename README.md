@@ -164,7 +164,7 @@ This file is just a placeholder. It's content will be replaced by output from th
 >
 > ```yaml
 > tailwindcss:
->   config_file: ./_data/tailwind.css
+>   css_path: ./_data/tailwind.css
 > ```
 
 ### Building the Jekyll site

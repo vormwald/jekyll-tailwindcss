@@ -127,6 +127,16 @@ tailwindcss:
 
 > See an example repo at https://github.com/vormwald/jekyll-blahg
 
+### Quick start
+
+Run the `install` subcommand to generate the files described below automatically:
+
+```sh
+bundle exec jekyll tailwindcss:install
+```
+
+This creates `./_tailwind.css` and `./assets/css/styles.tailwindcss` if they don't already exist, and prints the next steps to get your layout wired up.
+
 ### Setup
 You'll need 2 files to make this work:
 

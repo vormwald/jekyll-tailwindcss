@@ -11,19 +11,22 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     ast (2.4.2)
     base64 (0.2.0)
-    bigdecimal (3.1.9)
+    bigdecimal (4.1.2)
+    cgi (0.5.2)
     colorator (1.1.0)
     concurrent-ruby (1.3.5)
     csv (3.3.2)
+    date (3.5.1)
     diff-lcs (1.5.1)
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
-    erb (6.0.7)
+    erb (4.0.4.1)
+      cgi (>= 0.3.3)
     eventmachine (1.2.7)
     ffi (1.17.1)
     forwardable-extended (2.6.0)
-    google-protobuf (4.29.3)
+    google-protobuf (4.33.6)
       bigdecimal
       rake (>= 13)
     http_parser.rb (0.8.0)
@@ -81,6 +84,9 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
+    psych (5.4.0)
+      date
+      stringio
     public_suffix (6.0.1)
     racc (1.8.1)
     rainbow (3.1.1)
@@ -88,14 +94,9 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
-    rbs (4.1.3)
-      logger
-      prism (>= 1.6.0)
-      tsort
-    rdoc (8.0.0)
+    rdoc (7.2.0)
       erb
-      prism (>= 1.6.0)
-      rbs (>= 4.0.0)
+      psych (>= 4.0.0)
       tsort
     regexp_parser (2.10.0)
     reline (0.7.0)
@@ -132,11 +133,11 @@ GEM
       rubocop-ast (>= 1.31.1, < 2.0)
     ruby-progressbar (1.13.0)
     safe_yaml (1.0.5)
-    sass-embedded (1.83.4)
-      google-protobuf (~> 4.29)
-      rake (>= 13)
-    sass-embedded (1.83.4-x86_64-linux-gnu)
-      google-protobuf (~> 4.29)
+    sass-embedded (1.77.0)
+      google-protobuf (>= 3.25, < 5.0)
+      rake (>= 13.0.0)
+    sass-embedded (1.77.0-x86_64-linux-gnu)
+      google-protobuf (>= 3.25, < 5.0)
     standard (1.44.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -149,6 +150,7 @@ GEM
     standard-performance (1.6.0)
       lint_roller (~> 1.1)
       rubocop-performance (~> 1.23.0)
+    stringio (3.2.0)
     tailwindcss-ruby (4.0.6)
     tailwindcss-ruby (4.0.6-x86_64-linux-gnu)
     terminal-table (3.0.2)
@@ -164,11 +166,15 @@ PLATFORMS
 DEPENDENCIES
   base64
   csv
+  erb (< 5)
   irb (~> 1.14)
   jekyll (~> 4.3)
   jekyll-tailwindcss!
+  logger
   rake (~> 13.0)
+  rdoc (< 8)
   rspec (~> 3.0)
+  sass-embedded (< 1.77.1)
   standard (~> 1.3)
 
 BUNDLED WITH

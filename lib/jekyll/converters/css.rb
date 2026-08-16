@@ -1,5 +1,3 @@
-require "open3"
-
 module Jekyll
   module Converters
     class Css < Converter
@@ -23,22 +21,9 @@ module Jekyll
         end
 
         dev_mode = Jekyll.env == "development"
-        Jekyll.logger.info "Jekyll Tailwind:", "Generating #{dev_mode ? "" : "minified "}CSS"
+        Jekyll.logger.info "Jekyll Tailwind:", "Generating #{"minified " unless dev_mode}CSS"
 
-        compile_command = ::Tailwindcss::Commands
-          .compile_command(debug: dev_mode, config_path: config_path, postcss_path: postcss_path)
-          .join(" ")
-
-        output, error = nil
-        Open3.popen3(tailwindcss_env_options, compile_command) do |stdin, stdout, stderr, _wait_thread|
-          stdin.write content # write the content of *.tailwindcss to the tailwindcss CLI as input
-          stdin.close
-          output = stdout.read
-          error = stderr.read
-        end
-        Jekyll.logger.warn "Jekyll Tailwind:", error unless error.nil?
-
-        output
+        ::Jekyll::Tailwindcss::Commands.compile(content, debug: dev_mode, config_path: config_path, postcss_path: postcss_path)
       rescue => e
         Jekyll.logger.error "Jekyll Tailwind:", e.message
         content
@@ -50,12 +35,6 @@ module Jekyll
         return false if content.include?("@plugin")
 
         content.include?("@tailwind")
-      end
-
-      def tailwindcss_env_options
-        # Without this ENV you'll get a warning about `Browserslist: caniuse-lite is outdated`
-        # Since we're using the CLI, we can't update the data, so we ignore it.
-        {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"}
       end
 
       def config_path

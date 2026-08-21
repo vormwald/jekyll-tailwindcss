@@ -25,8 +25,8 @@ module Jekyll
 
         ::Jekyll::Tailwindcss::Commands.compile(content, debug: dev_mode, config_path: config_path, postcss_path: postcss_path)
       rescue => e
-        Jekyll.logger.error "Jekyll Tailwind:", e.message
-        content
+        Jekyll.logger.error "Jekyll Tailwind:", "#{e.class}: #{e.message}"
+        nil
       end
 
       private

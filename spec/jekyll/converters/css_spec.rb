@@ -176,10 +176,10 @@ RSpec.describe Jekyll::Converters::Css do
         allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_raise(StandardError, "boom")
       end
 
-      it "logs the error and returns the original content" do
-        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", "boom")
+      it "logs the error and returns nil so Jekyll does not write a bad file" do
+        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", "StandardError: boom")
 
-        expect(converter.convert(tailwindcss_content)).to eq(tailwindcss_content)
+        expect(converter.convert(tailwindcss_content)).to be_nil
       end
     end
   end

@@ -14,7 +14,6 @@ gem "standard", "~> 1.3"
 gem "csv"
 gem "logger"
 gem "base64"
-gem "logger"
 
 # transitive deps whose newer releases require ruby >= 3.2; CI still tests ruby 3.1
 gem "rdoc", "< 8" # rdoc 8 requires ruby >= 3.2 and pulls in rbs (also >= 3.2)

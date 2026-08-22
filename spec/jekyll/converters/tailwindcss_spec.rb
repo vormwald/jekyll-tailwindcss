@@ -41,29 +41,21 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
     let(:css_path) { "./_tailwind.css" }
     let(:tailwind_input) { "@import '#{css_path}';" }
     let(:tailwind_output) { "body { color: red; }" }
-    let(:error_message) { nil }
     let(:ignored_content_input) { "This is ignored" }
 
     let(:jekyll_env) { "development" }
-    let(:mock_stdin) { instance_double(IO).as_null_object }
-    let(:mock_stdout) { instance_double(IO, read: tailwind_output) }
-    let(:mock_stderr) { instance_double(IO, read: error_message) }
-
-    let(:compile_command_regex) { /.+\/tailwindcss --input -$/ }
-    let(:compile_arguments) { ["--input", "-"] }
 
     before do
       allow(Jekyll).to receive(:env).and_return(jekyll_env)
-      allow(Open3).to receive(:popen3).with(compile_command_regex).and_yield(mock_stdin, mock_stdout, mock_stderr, nil)
+      allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_return(tailwind_output)
     end
 
     context "using defaults" do
       it "calls the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-        expect(Jekyll.logger).not_to receive(:warn)
-        expect(mock_stdin).to receive(:write).with(tailwind_input)
-        expect(mock_stdout).to receive(:read)
-        expect(mock_stderr).to receive(:read)
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwind_input, debug: true)
+          .and_return(tailwind_output)
 
         expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
       end
@@ -81,10 +73,9 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
       it "passes the config path to the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-        expect(Jekyll.logger).not_to receive(:warn)
-        expect(mock_stdin).to receive(:write).with(tailwind_input)
-        expect(mock_stdout).to receive(:read)
-        expect(mock_stderr).to receive(:read)
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwind_input, debug: true)
+          .and_return(tailwind_output)
 
         expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
       end
@@ -105,9 +96,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
       it "calls prints a helpful message, does not convert" do
         expect(Jekyll.logger).to receive(:warn).with("Jekyll Tailwind:",
           "You're using a .tailwindcss file extension, but your tailwindcss-ruby gem is below version 4.0.")
-        expect(mock_stdin).not_to receive(:write)
-        expect(mock_stdout).not_to receive(:read)
-        expect(mock_stderr).not_to receive(:read)
+        expect(Jekyll::Tailwindcss::Commands).not_to receive(:compile)
 
         expect(converter.convert(ignored_content_input)).to be_nil
       end
@@ -115,23 +104,36 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
     context "when not in development mode" do
       let(:jekyll_env) { "production" }
-      let(:compile_command_regex) { /--minify$/ }
 
       it "includes the --minify option" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating minified CSS")
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwind_input, debug: false)
+          .and_return(tailwind_output)
+
         expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
       end
     end
 
-    context "when CLI returns an error" do
-      let(:error_message) { "Unknown word at Input.error..." }
+    context "when the CLI fails" do
+      before do
+        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_return(nil)
+      end
 
-      it "logs the error, still returns output from stdout" do
-        expect(Jekyll.logger).to receive(:warn).with("Jekyll Tailwind:", error_message)
-        expect(mock_stdout).to receive(:read)
-        expect(mock_stderr).to receive(:read)
+      it "returns nil so Jekyll does not write the placeholder content" do
+        expect(converter.convert(ignored_content_input)).to be_nil
+      end
+    end
 
-        expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
+    context "when compiling raises an unexpected error" do
+      before do
+        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_raise(StandardError, "boom")
+      end
+
+      it "logs the error and returns nil instead of the placeholder content" do
+        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", "StandardError: boom")
+
+        expect(converter.convert(ignored_content_input)).to be_nil
       end
     end
   end

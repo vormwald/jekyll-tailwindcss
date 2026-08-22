@@ -39,29 +39,20 @@ RSpec.describe Jekyll::Converters::Css do
       TAILWINDCSS
     end
     let(:css_content) { "body { color: red; }" }
-    let(:error_message) { nil }
 
     let(:jekyll_env) { "development" }
-    let(:env_options) { {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"} }
-    let(:mock_stdin) { instance_double(IO).as_null_object }
-    let(:mock_stdout) { instance_double(IO, read: css_content) }
-    let(:mock_stderr) { instance_double(IO, read: error_message) }
-
-    let(:compile_command_regex) { /.+\/tailwindcss --input -$/ }
-    let(:compile_arguments) { ["--input", "-"] }
 
     before do
       allow(Jekyll).to receive(:env).and_return(jekyll_env)
-      allow(Open3).to receive(:popen3).with(env_options, compile_command_regex).and_yield(mock_stdin, mock_stdout, mock_stderr, nil)
+      allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_return(css_content)
     end
 
     context "using defaults" do
       it "calls the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-        expect(Jekyll.logger).not_to receive(:warn)
-        expect(mock_stdin).to receive(:write).with(tailwindcss_content)
-        expect(mock_stdout).to receive(:read)
-        expect(mock_stderr).to receive(:read)
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwindcss_content, debug: true, config_path: nil, postcss_path: nil)
+          .and_return(css_content)
 
         expect(converter.convert(tailwindcss_content)).to eq(css_content)
       end
@@ -79,10 +70,9 @@ RSpec.describe Jekyll::Converters::Css do
 
       it "calls the tailwind CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-        expect(Jekyll.logger).not_to receive(:warn)
-        expect(mock_stdin).to receive(:write).with(tailwindcss_content)
-        expect(mock_stdout).to receive(:read)
-        expect(mock_stderr).to receive(:read)
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwindcss_content, debug: true, config_path: nil, postcss_path: nil)
+          .and_return(css_content)
 
         expect(converter.convert(tailwindcss_content)).to eq(css_content)
       end
@@ -121,15 +111,12 @@ RSpec.describe Jekyll::Converters::Css do
           }
         }
       end
-      let(:compile_command_regex) { /.+\/tailwindcss --input - --config tailwind.config.js$/ }
-      let(:compile_arguments) { ["--input", "-", "--config", "./tailwind.config.js"] }
 
       it "calls the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-        expect(Jekyll.logger).not_to receive(:warn)
-        expect(mock_stdin).to receive(:write).with(tailwindcss_content)
-        expect(mock_stdout).to receive(:read)
-        expect(mock_stderr).to receive(:read)
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwindcss_content, debug: true, config_path: "tailwind.config.js", postcss_path: nil)
+          .and_return(css_content)
 
         expect(converter.convert(tailwindcss_content)).to eq(css_content)
       end
@@ -150,15 +137,11 @@ RSpec.describe Jekyll::Converters::Css do
             }
           }
         end
-        let(:compile_command_regex) { /.+\/tailwindcss --input - --config other_location$/ }
-        let(:compile_arguments) { ["--input", "-", "--config", "./other_location"] }
 
         it "uses custom config location" do
-          converter.instance_variable_set(:@config, {
-            "tailwindcss" => {
-              "config" => "other_location"
-            }
-          })
+          expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+            .with(tailwindcss_content, debug: true, config_path: "other_location", postcss_path: nil)
+            .and_return(css_content)
 
           converter.convert(tailwindcss_content)
         end
@@ -167,23 +150,36 @@ RSpec.describe Jekyll::Converters::Css do
 
     context "when not in development mode" do
       let(:jekyll_env) { "production" }
-      let(:compile_command_regex) { /--minify$/ }
 
       it "includes the --minify option" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating minified CSS")
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwindcss_content, debug: false, config_path: nil, postcss_path: nil)
+          .and_return(css_content)
+
         expect(converter.convert(tailwindcss_content)).to eq(css_content)
       end
     end
 
-    context "when CLI returns an error" do
-      let(:error_message) { "Unknown word at Input.error..." }
+    context "when the CLI fails" do
+      before do
+        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_return(nil)
+      end
 
-      it "logs the error, still returns output from stdout" do
-        expect(Jekyll.logger).to receive(:warn).with("Jekyll Tailwind:", error_message)
-        expect(mock_stdout).to receive(:read)
-        expect(mock_stderr).to receive(:read)
+      it "returns nil so Jekyll does not write a bad file" do
+        expect(converter.convert(tailwindcss_content)).to be_nil
+      end
+    end
 
-        expect(converter.convert(tailwindcss_content)).to eq(css_content)
+    context "when compiling raises an unexpected error" do
+      before do
+        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_raise(StandardError, "boom")
+      end
+
+      it "logs the error and returns nil so Jekyll does not write a bad file" do
+        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", "StandardError: boom")
+
+        expect(converter.convert(tailwindcss_content)).to be_nil
       end
     end
   end

@@ -23,7 +23,7 @@ module Jekyll
         end
 
         dev_mode = Jekyll.env == "development"
-        Jekyll.logger.info "Jekyll Tailwind:", "Generating #{"minified " unless dev_mode}CSS"
+        Jekyll.logger.info "Jekyll Tailwind:", "Generating #{dev_mode ? "" : "minified "}CSS"
 
         compile_command = ::Tailwindcss::Commands
           .compile_command(debug: dev_mode, config_path: config_path, postcss_path: postcss_path)

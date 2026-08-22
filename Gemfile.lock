@@ -21,13 +21,11 @@ GEM
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
     eventmachine (1.2.7)
-    ffi (1.17.1)
-    ffi (1.17.1-x86_64-linux-gnu)
+    ffi (1.17.4)
+    ffi (1.17.4-arm64-darwin)
+    ffi (1.17.4-x86_64-linux-gnu)
     forwardable-extended (2.6.0)
-    google-protobuf (4.29.3)
-      bigdecimal
-      rake (>= 13)
-    google-protobuf (4.29.3-x86_64-linux)
+    google-protobuf (4.33.6)
       bigdecimal
       rake (>= 13)
     http_parser.rb (0.8.0)
@@ -72,6 +70,7 @@ GEM
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    logger (1.7.0)
     mercenary (0.4.0)
     parallel (1.26.3)
     parser (3.3.7.1)
@@ -132,6 +131,8 @@ GEM
     sass-embedded (1.83.4)
       google-protobuf (~> 4.29)
       rake (>= 13)
+    sass-embedded (1.83.4-arm64-darwin)
+      google-protobuf (~> 4.29)
     sass-embedded (1.83.4-x86_64-linux-gnu)
       google-protobuf (~> 4.29)
     standard (1.44.0)
@@ -148,6 +149,7 @@ GEM
       rubocop-performance (~> 1.23.0)
     stringio (3.1.2)
     tailwindcss-ruby (4.0.6)
+    tailwindcss-ruby (4.0.6-arm64-darwin)
     tailwindcss-ruby (4.0.6-x86_64-linux-gnu)
     terminal-table (3.0.2)
       unicode-display_width (>= 1.1.1, < 3)
@@ -155,6 +157,7 @@ GEM
     webrick (1.9.1)
 
 PLATFORMS
+  arm64-darwin
   ruby
   x86_64-linux
 
@@ -164,6 +167,7 @@ DEPENDENCIES
   irb (~> 1.14)
   jekyll (~> 4.3)
   jekyll-tailwindcss!
+  logger
   rake (~> 13.0)
   rspec (~> 3.0)
   standard (~> 1.3)

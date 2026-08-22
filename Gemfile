@@ -12,6 +12,7 @@ gem "standard", "~> 1.3"
 
 # needed as a jekyll dependency since ruby 3.4 removed them
 gem "csv"
+gem "logger"
 gem "base64"
 
 group :development, :test do

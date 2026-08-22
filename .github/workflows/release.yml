@@ -24,4 +24,11 @@ jobs:
         with:
           bundler-cache: true
           ruby-version: ruby
+      - name: Verify tag matches gem version
+        run: |
+          gem_version="$(ruby -Ilib -rjekyll-tailwindcss/version -e 'print Jekyll::Tailwindcss::VERSION')"
+          if [ "${GITHUB_REF_NAME}" != "v${gem_version}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match gem version ${gem_version} (expected v${gem_version})" >&2
+            exit 1
+          fi
       - uses: rubygems/release-gem@v1

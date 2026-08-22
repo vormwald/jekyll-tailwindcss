@@ -206,15 +206,17 @@ end
 
 ### Cutting a release
 
+Releases are published to RubyGems automatically via [trusted publishing](https://guides.rubygems.org/trusted-publishing/). Pushing the version tag is the publishing step — do not `gem push` by hand.
+
 - bump the version
   - [ ] update `lib/jekyll-tailwindcss/version.rb`
   - [ ] update `CHANGELOG.md`
   - [ ] bundle install to pick up the new version
-  - [ ] commit and create a git tag ( example `git tag -a v0.3.1 -m "Release 0.3.1"` )
-- push
-  - [ ] `bundle exec rake build`
-  - [ ] `gem push pkg/jekyll-tailwind-[NEW_VERSION].gem
+  - [ ] commit and merge to `main`
+- publish
+  - [ ] tag the release commit, matching the new version exactly ( example `git tag -a v0.3.1 -m "Release 0.3.1"` )
   - [ ] `git push --follow-tags`
+  - [ ] watch the `Release` workflow — it runs the test matrix, verifies the tag matches `VERSION`, and publishes the gem
 - announce
   - [ ] create a release at https://github.com/vormwald/jekyll-tailwindcss/releases
 

@@ -1,5 +1,3 @@
-require "open3"
-
 module Jekyll
   module Converters
     class Tailwindcss < Converter
@@ -23,25 +21,12 @@ module Jekyll
         end
 
         dev_mode = Jekyll.env == "development"
-        Jekyll.logger.info "Jekyll Tailwind:", "Generating #{dev_mode ? "" : "minified "}CSS"
+        Jekyll.logger.info "Jekyll Tailwind:", "Generating #{"minified " unless dev_mode}CSS"
 
-        compile_command = ::Tailwindcss::Commands
-          .compile_command(debug: dev_mode)
-          .join(" ")
-
-        output, error = nil
-        Open3.popen3(compile_command) do |stdin, stdout, stderr, _wait_thread|
-          stdin.write tailwind_content
-          stdin.close
-          output = stdout.read
-          error = stderr.read
-        end
-        Jekyll.logger.warn "Jekyll Tailwind:", error unless error.nil?
-
-        output
+        ::Jekyll::Tailwindcss::Commands.compile(tailwind_content, debug: dev_mode)
       rescue => e
-        Jekyll.logger.error "Jekyll Tailwind:", e.message
-        content
+        Jekyll.logger.error "Jekyll Tailwind:", "#{e.class}: #{e.message}"
+        nil
       end
 
       private

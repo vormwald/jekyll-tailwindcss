@@ -12,8 +12,11 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.0"
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.files = Dir["{app,lib}/**/*", "LICENSE", "Rakefile", "README.md"]
-  spec.bindir = "exe"
+  spec.metadata["changelog_uri"] = "https://github.com/vormwald/jekyll-tailwindcss/blob/main/CHANGELOG.md"
+  spec.metadata["source_code_uri"] = "https://github.com/vormwald/jekyll-tailwindcss"
+  spec.metadata["bug_tracker_uri"] = "https://github.com/vormwald/jekyll-tailwindcss/issues"
+  spec.metadata["rubygems_mfa_required"] = "true"
+  spec.files = Dir["{app,lib}/**/*", "LICENSE", "Rakefile", "README.md", "CHANGELOG.md"]
   spec.require_paths = ["lib"]
   spec.add_dependency "tailwindcss-ruby"
 end

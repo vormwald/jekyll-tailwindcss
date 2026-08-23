@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Drop support for Ruby 3.1, which reached end-of-life on 2025-03-31. The gem now requires Ruby >= 3.2.
 
 ## [0.7.0] - 2025-04-12
 - Added a new (and better) way to organize your project with _tailwind.css and styles.tailwindcss files [#26](https://github.com/vormwald/jekyll-tailwindcss/pull/26) 

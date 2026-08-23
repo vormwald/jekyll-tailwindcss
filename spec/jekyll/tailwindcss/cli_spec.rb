@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe Jekyll::Tailwindcss::Commands do
+RSpec.describe Jekyll::Tailwindcss::CLI do
   let(:executable) { instance_double(Tailwindcss::Ruby.executable) }
   before do
     allow(Tailwindcss::Ruby).to receive(:executable).and_return(executable)

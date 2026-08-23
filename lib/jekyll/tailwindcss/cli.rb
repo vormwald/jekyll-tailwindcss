@@ -5,7 +5,7 @@ require "tailwindcss/ruby"
 
 module Jekyll
   module Tailwindcss
-    module Commands
+    module CLI
       # Without this ENV you'll get a warning about `Browserslist: caniuse-lite is outdated`
       # Since we're using the CLI, we can't update the data, so we ignore it.
       ENV_OPTIONS = {"BROWSERSLIST_IGNORE_OLD_DATA" => "1"}.freeze

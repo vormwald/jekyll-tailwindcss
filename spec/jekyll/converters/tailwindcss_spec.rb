@@ -47,13 +47,13 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
     before do
       allow(Jekyll).to receive(:env).and_return(jekyll_env)
-      allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_return(tailwind_output)
+      allow(Jekyll::Tailwindcss::CLI).to receive(:compile).and_return(tailwind_output)
     end
 
     context "using defaults" do
       it "calls the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+        expect(Jekyll::Tailwindcss::CLI).to receive(:compile)
           .with(tailwind_input, debug: true)
           .and_return(tailwind_output)
 
@@ -73,7 +73,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
       it "passes the config path to the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
-        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+        expect(Jekyll::Tailwindcss::CLI).to receive(:compile)
           .with(tailwind_input, debug: true)
           .and_return(tailwind_output)
 
@@ -96,7 +96,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
       it "calls prints a helpful message, does not convert" do
         expect(Jekyll.logger).to receive(:warn).with("Jekyll Tailwind:",
           "You're using a .tailwindcss file extension, but your tailwindcss-ruby gem is below version 4.0.")
-        expect(Jekyll::Tailwindcss::Commands).not_to receive(:compile)
+        expect(Jekyll::Tailwindcss::CLI).not_to receive(:compile)
 
         expect(converter.convert(ignored_content_input)).to be_nil
       end
@@ -107,7 +107,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
       it "includes the --minify option" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating minified CSS")
-        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+        expect(Jekyll::Tailwindcss::CLI).to receive(:compile)
           .with(tailwind_input, debug: false)
           .and_return(tailwind_output)
 
@@ -117,7 +117,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
     context "when the CLI fails" do
       before do
-        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_return(nil)
+        allow(Jekyll::Tailwindcss::CLI).to receive(:compile).and_return(nil)
       end
 
       it "returns nil so Jekyll does not write the placeholder content" do
@@ -127,7 +127,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
 
     context "when compiling raises an unexpected error" do
       before do
-        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_raise(StandardError, "boom")
+        allow(Jekyll::Tailwindcss::CLI).to receive(:compile).and_raise(StandardError, "boom")
       end
 
       it "logs the error and returns nil instead of the placeholder content" do

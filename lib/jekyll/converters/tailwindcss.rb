@@ -23,7 +23,7 @@ module Jekyll
         dev_mode = Jekyll.env == "development"
         Jekyll.logger.info "Jekyll Tailwind:", "Generating #{"minified " unless dev_mode}CSS"
 
-        ::Jekyll::Tailwindcss::Commands.compile(tailwind_content, debug: dev_mode)
+        ::Jekyll::Tailwindcss::CLI.compile(tailwind_content, debug: dev_mode)
       rescue => e
         Jekyll.logger.error "Jekyll Tailwind:", "#{e.class}: #{e.message}"
         nil

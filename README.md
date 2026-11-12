@@ -179,6 +179,18 @@ bundle exec jekyll serve
 
 The `--minify` flag is automatically added when the `JEKYLL_ENV` environment variable is present and set to anything other than `development`. [Jekyll Docs](https://jekyllrb.com/docs/configuration/environments/)
 
+### Deploying (Cloudflare Pages, Netlify, GitHub Actions, etc.)
+
+The Tailwind CLI is a platform-specific binary that comes from the `tailwindcss-ruby` gem. If you develop on a Mac and deploy from a Linux build server, your `Gemfile.lock` needs the Linux platform too, or Bundler installs a version of `tailwindcss-ruby` without the binary:
+
+```sh
+bundle lock --add-platform x86_64-linux
+```
+
+Add `aarch64-linux` as well if your host builds on ARM.
+
+If Tailwind can't compile your CSS (missing binary, invalid CSS, a v3 setup without a config file), this gem raises an error and `jekyll build` exits non-zero, so your host fails the deploy instead of publishing an unstyled site.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests.

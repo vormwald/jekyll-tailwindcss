@@ -16,17 +16,14 @@ module Jekyll
       def convert(content)
         return content unless /@tailwind|@import ['"]tailwindcss/i.match?(content)
         if config_path.nil? && tailwind_v3_syntax?(content)
-          Jekyll.logger.error "Jekyll Tailwind:", "to use tailwind v3 you need to include a config path in _config.yml"
-          return content
+          raise ::Jekyll::Tailwindcss::CompilationError,
+            "to use tailwind v3 you need to include a config path in _config.yml"
         end
 
         dev_mode = Jekyll.env == "development"
         Jekyll.logger.info "Jekyll Tailwind:", "Generating #{"minified " unless dev_mode}CSS"
 
         ::Jekyll::Tailwindcss::Commands.compile(content, debug: dev_mode, config_path: config_path, postcss_path: postcss_path)
-      rescue => e
-        Jekyll.logger.error "Jekyll Tailwind:", "#{e.class}: #{e.message}"
-        nil
       end
 
       private

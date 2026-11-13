@@ -74,11 +74,34 @@ RSpec.describe Jekyll::Tailwindcss::Commands do
       let(:stdout) { "" }
       let(:stderr) { "Unknown word at Input.error..." }
 
-      it "logs the error and returns nil" do
-        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", a_string_including(stderr))
+      it "raises CompilationError with the CLI's stderr" do
         expect(Jekyll.logger).not_to receive(:warn)
 
-        expect(described_class.compile(content)).to be_nil
+        expect { described_class.compile(content) }
+          .to raise_error(Jekyll::Tailwindcss::CompilationError, /exited with status 1:\n#{Regexp.escape(stderr)}/)
+      end
+    end
+
+    context "when the CLI can't be run" do
+      before do
+        allow(Open3).to receive(:capture3).and_raise(Errno::EACCES, "tailwindcss")
+      end
+
+      it "raises CompilationError" do
+        expect { described_class.compile(content) }
+          .to raise_error(Jekyll::Tailwindcss::CompilationError, /could not run the tailwindcss CLI/)
+      end
+    end
+
+    context "when there's no tailwindcss binary for this platform" do
+      before do
+        allow(Tailwindcss::Ruby).to receive(:executable)
+          .and_raise(Tailwindcss::Ruby::ExecutableNotFoundException, "Cannot find the tailwindcss executable for x86_64-linux")
+      end
+
+      it "raises CompilationError with tailwindcss-ruby's guidance" do
+        expect { described_class.compile(content) }
+          .to raise_error(Jekyll::Tailwindcss::CompilationError, /Cannot find the tailwindcss executable for x86_64-linux/)
       end
     end
   end

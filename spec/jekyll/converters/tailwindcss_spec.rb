@@ -93,12 +93,11 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
           .and_return({"tailwindcss-ruby" => tailwindcss_ruby_stub})
       end
 
-      it "calls prints a helpful message, does not convert" do
-        expect(Jekyll.logger).to receive(:warn).with("Jekyll Tailwind:",
-          "You're using a .tailwindcss file extension, but your tailwindcss-ruby gem is below version 4.0.")
+      it "raises a helpful error so the build fails" do
         expect(Jekyll::Tailwindcss::Commands).not_to receive(:compile)
 
-        expect(converter.convert(ignored_content_input)).to be_nil
+        expect { converter.convert(ignored_content_input) }
+          .to raise_error(Jekyll::Tailwindcss::CompilationError, /tailwindcss-ruby gem is below version 4.0/)
       end
     end
 
@@ -115,25 +114,15 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
       end
     end
 
-    context "when the CLI fails" do
+    context "when compiling fails" do
       before do
-        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_return(nil)
+        allow(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .and_raise(Jekyll::Tailwindcss::CompilationError, "boom")
       end
 
-      it "returns nil so Jekyll does not write the placeholder content" do
-        expect(converter.convert(ignored_content_input)).to be_nil
-      end
-    end
-
-    context "when compiling raises an unexpected error" do
-      before do
-        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_raise(StandardError, "boom")
-      end
-
-      it "logs the error and returns nil instead of the placeholder content" do
-        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", "StandardError: boom")
-
-        expect(converter.convert(ignored_content_input)).to be_nil
+      it "lets the error propagate so the build fails" do
+        expect { converter.convert(ignored_content_input) }
+          .to raise_error(Jekyll::Tailwindcss::CompilationError, "boom")
       end
     end
   end

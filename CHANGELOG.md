@@ -1,4 +1,5 @@
 ## [Unreleased]
+- **Breaking:** Tailwind failures now fail the Jekyll build. A missing tailwindcss binary, a CLI error, a v3 stylesheet without a `tailwindcss.config` path, or a `.tailwindcss` file on tailwindcss-ruby < 4 raises `Jekyll::Tailwindcss::CompilationError`, and `jekyll build` exits non-zero. Previously the gem logged the error and published the uncompiled source.
 - Drop support for Ruby 3.1, which reached end-of-life on 2025-03-31. The gem now requires Ruby >= 3.2.
 
 ## [0.7.0] - 2025-04-12

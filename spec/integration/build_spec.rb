@@ -39,4 +39,30 @@ RSpec.describe "building a Jekyll site with the real tailwindcss CLI" do
       expect(generated_css).to match(/text-center/)
     end
   end
+
+  it "fails the build when tailwind can't compile the CSS" do
+    Dir.mktmpdir do |tmp|
+      source = File.join(tmp, "site")
+      destination = File.join(tmp, "_site")
+      FileUtils.cp_r(fixture_source, source)
+      File.write(File.join(source, "_tailwind.css"), <<~CSS)
+        @import "tailwindcss";
+        .broken { @apply not-a-real-utility; }
+      CSS
+
+      Dir.chdir(source) do
+        config = Jekyll.configuration(
+          "source" => source,
+          "destination" => destination,
+          "quiet" => true
+        )
+        site = Jekyll::Site.new(config)
+
+        expect { site.process }
+          .to raise_error(Jekyll::Tailwindcss::CompilationError, /Cannot apply unknown utility class/)
+      end
+
+      expect(File).not_to exist(File.join(destination, "assets", "css", "styles.css"))
+    end
+  end
 end

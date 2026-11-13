@@ -123,9 +123,10 @@ RSpec.describe Jekyll::Converters::Css do
 
       context "when no config path is specified" do
         let(:plugin_config) { {} }
-        it "logs an error" do
-          expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", "to use tailwind v3 you need to include a config path in _config.yml")
-          converter.convert(tailwindcss_content)
+        it "raises so the build fails" do
+          expect(Jekyll::Tailwindcss::Commands).not_to receive(:compile)
+          expect { converter.convert(tailwindcss_content) }
+            .to raise_error(Jekyll::Tailwindcss::CompilationError, "to use tailwind v3 you need to include a config path in _config.yml")
         end
       end
 
@@ -161,25 +162,23 @@ RSpec.describe Jekyll::Converters::Css do
       end
     end
 
-    context "when the CLI fails" do
+    context "when compiling fails" do
       before do
-        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_return(nil)
+        allow(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .and_raise(Jekyll::Tailwindcss::CompilationError, "boom")
       end
 
-      it "returns nil so Jekyll does not write a bad file" do
-        expect(converter.convert(tailwindcss_content)).to be_nil
+      it "lets the error propagate so the build fails" do
+        expect { converter.convert(tailwindcss_content) }
+          .to raise_error(Jekyll::Tailwindcss::CompilationError, "boom")
       end
     end
 
-    context "when compiling raises an unexpected error" do
-      before do
-        allow(Jekyll::Tailwindcss::Commands).to receive(:compile).and_raise(StandardError, "boom")
-      end
+    context "when the content is plain CSS" do
+      it "returns it untouched without calling the CLI" do
+        expect(Jekyll::Tailwindcss::Commands).not_to receive(:compile)
 
-      it "logs the error and returns nil so Jekyll does not write a bad file" do
-        expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", "StandardError: boom")
-
-        expect(converter.convert(tailwindcss_content)).to be_nil
+        expect(converter.convert(css_content)).to eq(css_content)
       end
     end
   end

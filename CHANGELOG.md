@@ -1,5 +1,6 @@
 ## [Unreleased]
 - Drop support for Ruby 3.1, which reached end-of-life on 2025-03-31. The gem now requires Ruby >= 3.2.
+- Fix CSS compilation failing with `invalid byte sequence in US-ASCII` on build machines without a UTF-8 locale (e.g. `LANG=C`). The tailwindcss CLI's input and output are now always handled as UTF-8. [#36](https://github.com/vormwald/jekyll-tailwindcss/issues/36)
 
 ## [0.7.0] - 2025-04-12
 - Added a new (and better) way to organize your project with _tailwind.css and styles.tailwindcss files [#26](https://github.com/vormwald/jekyll-tailwindcss/pull/26) 

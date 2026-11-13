@@ -28,7 +28,14 @@ module Jekyll
         # CSS on success or nil (after logging) on failure.
         def compile(content, **kwargs)
           command = compile_command(**kwargs)
-          stdout, stderr, status = Open3.capture3(ENV_OPTIONS, *command, stdin_data: content)
+          # The CLI reads and writes UTF-8. Without binmode, Ruby tags the
+          # captured output with Encoding.default_external, which follows the
+          # locale; under LANG=C that's US-ASCII and any non-ASCII byte (the
+          # CLI's own "≈ tailwindcss" banner, or a character in the CSS) makes
+          # later string operations raise "invalid byte sequence".
+          stdout, stderr, status = Open3.capture3(ENV_OPTIONS, *command, stdin_data: content, binmode: true)
+          stdout.force_encoding(Encoding::UTF_8)
+          stderr.force_encoding(Encoding::UTF_8)
 
           unless status.success?
             Jekyll.logger.error "Jekyll Tailwind:", "tailwindcss CLI exited with status #{status.exitstatus}:\n#{stderr}"

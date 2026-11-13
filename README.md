@@ -179,6 +179,26 @@ bundle exec jekyll serve
 
 The `--minify` flag is automatically added when the `JEKYLL_ENV` environment variable is present and set to anything other than `development`. [Jekyll Docs](https://jekyllrb.com/docs/configuration/environments/)
 
+## Troubleshooting
+
+### `Jekyll Tailwind: invalid byte sequence in US-ASCII`
+
+The build machine has no UTF-8 locale (common on minimal CI images), so Ruby treats the tailwindcss CLI output as US-ASCII. Versions after 0.7.0 handle this for you. On 0.7.0 and earlier, set a UTF-8 locale in the build environment:
+
+```sh
+LANG=C.UTF-8
+LC_ALL=C.UTF-8
+```
+
+### CSS ships uncompiled on Linux CI
+
+If your `Gemfile.lock` only lists the `ruby` platform (or only macOS platforms), Bundler on Linux installs `tailwindcss-ruby` without the tailwindcss binary. Add the Linux platforms your CI uses and commit the lockfile:
+
+```sh
+bundle lock --add-platform x86_64-linux
+bundle lock --add-platform aarch64-linux # if you build on ARM
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests.

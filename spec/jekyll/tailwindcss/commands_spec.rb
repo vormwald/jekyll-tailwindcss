@@ -40,15 +40,15 @@ RSpec.describe Jekyll::Tailwindcss::Commands do
 
   describe ".compile" do
     let(:content) { "@import 'tailwindcss';" }
-    let(:stdout) { "body { color: red; }" }
-    let(:stderr) { "" }
+    let(:stdout) { +"body { color: red; }" }
+    let(:stderr) { +"" }
     let(:exitstatus) { 0 }
     let(:status) { instance_double(Process::Status, success?: exitstatus.zero?, exitstatus: exitstatus) }
     let(:command) { described_class.compile_command }
 
     before do
       allow(Open3).to receive(:capture3)
-        .with(described_class::ENV_OPTIONS, *command, stdin_data: content)
+        .with(described_class::ENV_OPTIONS, *command, stdin_data: content, binmode: true)
         .and_return([stdout, stderr, status])
     end
 
@@ -60,7 +60,7 @@ RSpec.describe Jekyll::Tailwindcss::Commands do
     end
 
     context "when the CLI writes to stderr but succeeds" do
-      let(:stderr) { "Rebuilding..." }
+      let(:stderr) { +"Rebuilding..." }
 
       it "logs a single warning but still returns stdout" do
         expect(Jekyll.logger).to receive(:warn).with("Jekyll Tailwind:", stderr)
@@ -69,10 +69,27 @@ RSpec.describe Jekyll::Tailwindcss::Commands do
       end
     end
 
+    context "when the CLI output contains non-ASCII characters" do
+      # binmode: true makes Open3 return raw bytes
+      let(:stdout) { "a::before { content: \"\u2014\"; }".b }
+      let(:stderr) { "\u2248 tailwindcss v4.0.6\n\nDone in 25ms\n".b }
+
+      it "tags stdout and stderr as UTF-8" do
+        expect(Jekyll.logger).to receive(:warn)
+          .with("Jekyll Tailwind:", satisfy { |s| s.encoding == Encoding::UTF_8 && s.valid_encoding? })
+
+        result = described_class.compile(content)
+
+        expect(result.encoding).to eq(Encoding::UTF_8)
+        expect(result).to be_valid_encoding
+        expect(result).to include("\u2014")
+      end
+    end
+
     context "when the CLI exits with a nonzero status" do
       let(:exitstatus) { 1 }
-      let(:stdout) { "" }
-      let(:stderr) { "Unknown word at Input.error..." }
+      let(:stdout) { +"" }
+      let(:stderr) { +"Unknown word at Input.error..." }
 
       it "logs the error and returns nil" do
         expect(Jekyll.logger).to receive(:error).with("Jekyll Tailwind:", a_string_including(stderr))

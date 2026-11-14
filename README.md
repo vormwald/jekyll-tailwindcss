@@ -186,8 +186,8 @@ The `--minify` flag is automatically added when the `JEKYLL_ENV` environment var
 The build machine has no UTF-8 locale (common on minimal CI images), so Ruby treats the tailwindcss CLI output as US-ASCII. Versions after 0.7.0 handle this for you. On 0.7.0 and earlier, set a UTF-8 locale in the build environment:
 
 ```sh
-LANG=C.UTF-8
-LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
 ```
 
 ### CSS ships uncompiled on Linux CI

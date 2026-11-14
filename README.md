@@ -143,24 +143,24 @@ This file acts as your tailwind configuration file. Import "tailwindcss" and any
 
 **File 2: `./assets/css/styles.tailwindcss`**
 
-Place this file wherever you'd like your site's tailwind CLI generated content to go: `assets/css/your_css_file.tailwindcss` -> `__site/assets/css/your_css_file.css`
+Place this file wherever you'd like your site's tailwind CLI generated content to go: `assets/css/your_css_file.tailwindcss` -> `_site/assets/css/your_css_file.css`
 
 It must contain yaml frontmatter to be processed by Jekyll [^1]
 
 ```yaml
 ---
-# This file will be converted to __site/assets/css/styles.css
+# This file will be converted to _site/assets/css/styles.css
 ---
-This file is just a placeholder. It's content will be replaced by output from the tailwindcss CLI.
+This file is just a placeholder. Its content will be replaced by output from the tailwindcss CLI.
 ```
 
 > [!NOTE]
 > Why the 2 files?
 >
-> This is a compromise to allow the [TailwindCSS intellisense](https://tailwindcss.com/docs/editor-setup#intellisense-for-vs-code) plugin to work. (It cannot parse a CSS file with frontmatter, so we keep it seperate)
+> This is a compromise to allow the [TailwindCSS intellisense](https://tailwindcss.com/docs/editor-setup#intellisense-for-vs-code) plugin to work. (It cannot parse a CSS file with frontmatter, so we keep it separate)
 >
 > The `_tailwind.css` file serves as the tailwindcss config file.
-> If you'd rather set keep this file somewhere else, you can do so by setting the `tailwindcss.config_file` option in `_config.yml`:
+> If you'd rather keep this file somewhere else, you can do so by setting the `tailwindcss.css_path` option in `_config.yml`:
 >
 > ```yaml
 > tailwindcss:

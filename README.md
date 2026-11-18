@@ -143,24 +143,24 @@ This file acts as your tailwind configuration file. Import "tailwindcss" and any
 
 **File 2: `./assets/css/styles.tailwindcss`**
 
-Place this file wherever you'd like your site's tailwind CLI generated content to go: `assets/css/your_css_file.tailwindcss` -> `__site/assets/css/your_css_file.css`
+Place this file wherever you'd like your site's tailwind CLI generated content to go: `assets/css/your_css_file.tailwindcss` -> `_site/assets/css/your_css_file.css`
 
 It must contain yaml frontmatter to be processed by Jekyll [^1]
 
 ```yaml
 ---
-# This file will be converted to __site/assets/css/styles.css
+# This file will be converted to _site/assets/css/styles.css
 ---
-This file is just a placeholder. It's content will be replaced by output from the tailwindcss CLI.
+This file is just a placeholder. Its content will be replaced by output from the tailwindcss CLI.
 ```
 
 > [!NOTE]
 > Why the 2 files?
 >
-> This is a compromise to allow the [TailwindCSS intellisense](https://tailwindcss.com/docs/editor-setup#intellisense-for-vs-code) plugin to work. (It cannot parse a CSS file with frontmatter, so we keep it seperate)
+> This is a compromise to allow the [TailwindCSS intellisense](https://tailwindcss.com/docs/editor-setup#intellisense-for-vs-code) plugin to work. (It cannot parse a CSS file with frontmatter, so we keep it separate)
 >
 > The `_tailwind.css` file serves as the tailwindcss config file.
-> If you'd rather set keep this file somewhere else, you can do so by setting the `tailwindcss.config_file` option in `_config.yml`:
+> If you'd rather keep this file somewhere else, you can do so by setting the `tailwindcss.css_path` option in `_config.yml`:
 >
 > ```yaml
 > tailwindcss:
@@ -181,6 +181,12 @@ The `--minify` flag is automatically added when the `JEKYLL_ENV` environment var
 
 ## Troubleshooting
 
+### Build failures
+
+If Tailwind can't compile your CSS, this gem raises an error and `jekyll build` exits non-zero, so your host fails the deploy instead of publishing an unstyled site.
+
+If the error says `Cannot find the tailwindcss executable for x86_64-linux`, your `Gemfile.lock` probably lists the generic `ruby` platform, which installs `tailwindcss-ruby` without its binary. Run `bundle lock --add-platform x86_64-linux` and commit the lockfile. For ARM Linux, use `bundle lock --add-platform aarch64-linux`.
+
 ### `Jekyll Tailwind: invalid byte sequence in US-ASCII`
 
 The build machine has no UTF-8 locale (common on minimal CI images), so Ruby treats the tailwindcss CLI output as US-ASCII. Versions after 0.7.0 handle this for you. On 0.7.0 and earlier, set a UTF-8 locale in the build environment:
@@ -188,15 +194,6 @@ The build machine has no UTF-8 locale (common on minimal CI images), so Ruby tre
 ```sh
 export LANG=C.UTF-8
 export LC_ALL=C.UTF-8
-```
-
-### CSS ships uncompiled on Linux CI
-
-If your `Gemfile.lock` only lists the `ruby` platform (or only macOS platforms), Bundler on Linux installs `tailwindcss-ruby` without the tailwindcss binary. Add the Linux platforms your CI uses and commit the lockfile:
-
-```sh
-bundle lock --add-platform x86_64-linux
-bundle lock --add-platform aarch64-linux # if you build on ARM
 ```
 
 ## Development

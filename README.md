@@ -179,11 +179,22 @@ bundle exec jekyll serve
 
 The `--minify` flag is automatically added when the `JEKYLL_ENV` environment variable is present and set to anything other than `development`. [Jekyll Docs](https://jekyllrb.com/docs/configuration/environments/)
 
+## Troubleshooting
+
 ### Build failures
 
 If Tailwind can't compile your CSS, this gem raises an error and `jekyll build` exits non-zero, so your host fails the deploy instead of publishing an unstyled site.
 
-If the error says `Cannot find the tailwindcss executable for x86_64-linux`, your `Gemfile.lock` probably lists the generic `ruby` platform, which installs `tailwindcss-ruby` without its binary. Run `bundle lock --add-platform x86_64-linux` and commit the lockfile.
+If the error says `Cannot find the tailwindcss executable for x86_64-linux`, your `Gemfile.lock` probably lists the generic `ruby` platform, which installs `tailwindcss-ruby` without its binary. Run `bundle lock --add-platform x86_64-linux` and commit the lockfile. For ARM Linux, use `bundle lock --add-platform aarch64-linux`.
+
+### `Jekyll Tailwind: invalid byte sequence in US-ASCII`
+
+The build machine has no UTF-8 locale (common on minimal CI images), so Ruby treats the tailwindcss CLI output as US-ASCII. Versions after 0.7.0 handle this for you. On 0.7.0 and earlier, set a UTF-8 locale in the build environment:
+
+```sh
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+```
 
 ## Development
 

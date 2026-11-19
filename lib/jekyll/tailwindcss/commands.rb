@@ -43,14 +43,18 @@ module Jekyll
         # Runs the tailwindcss CLI against `content` and returns the compiled
         # CSS. Raises CompilationError if the CLI can't be found or run, or if
         # it exits unsuccessfully.
-        def compile(content, **kwargs)
+        #
+        # `chdir` sets the CLI's working directory. Tailwind resolves relative
+        # imports in stdin input and scans for class names from there, so
+        # callers pass the site source.
+        def compile(content, chdir: nil, **kwargs)
           command = compile_command(**kwargs)
           # The CLI reads and writes UTF-8. Without binmode, Ruby tags the
           # captured output with Encoding.default_external, which follows the
           # locale; under LANG=C that's US-ASCII and any non-ASCII byte (the
           # CLI's own "≈ tailwindcss" banner, or a character in the CSS) makes
           # later string operations raise "invalid byte sequence".
-          stdout, stderr, status = run(command, content)
+          stdout, stderr, status = run(command, content, chdir: chdir)
 
           unless status.success?
             raise CompilationError, "tailwindcss CLI exited with status #{status.exitstatus}:\n#{stderr}"
@@ -63,8 +67,10 @@ module Jekyll
 
         private
 
-        def run(command, content)
-          stdout, stderr, status = Open3.capture3(ENV_OPTIONS, *command, stdin_data: content, binmode: true)
+        def run(command, content, chdir: nil)
+          options = {stdin_data: content, binmode: true}
+          options[:chdir] = chdir if chdir
+          stdout, stderr, status = Open3.capture3(ENV_OPTIONS, *command, **options)
           stdout.force_encoding(Encoding::UTF_8)
           stderr.force_encoding(Encoding::UTF_8)
           [stdout, stderr, status]

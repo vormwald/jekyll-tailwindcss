@@ -160,7 +160,7 @@ This file is just a placeholder. Its content will be replaced by output from the
 > This is a compromise to allow the [TailwindCSS intellisense](https://tailwindcss.com/docs/editor-setup#intellisense-for-vs-code) plugin to work. (It cannot parse a CSS file with frontmatter, so we keep it separate)
 >
 > The `_tailwind.css` file serves as the tailwindcss config file.
-> If you'd rather keep this file somewhere else, you can do so by setting the `tailwindcss.css_path` option in `_config.yml`:
+> If you'd rather keep this file somewhere else, you can do so by setting the `tailwindcss.css_path` option in `_config.yml`. A relative path is resolved against your site source:
 >
 > ```yaml
 > tailwindcss:

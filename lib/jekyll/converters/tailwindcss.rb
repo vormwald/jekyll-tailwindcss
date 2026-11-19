@@ -14,34 +14,21 @@ module Jekyll
       end
 
       def convert(content)
-        unless valid_tailwindcss_gem_version?
+        unless ::Jekyll::Tailwindcss.v4?
           raise ::Jekyll::Tailwindcss::CompilationError, tailwind_v3_message
         end
 
         dev_mode = Jekyll.env == "development"
         Jekyll.logger.info "Jekyll Tailwind:", "Generating #{"minified " unless dev_mode}CSS"
 
-        ::Jekyll::Tailwindcss::Commands.compile(tailwind_content, debug: dev_mode)
+        ::Jekyll::Tailwindcss::Commands.compile(tailwind_content, debug: dev_mode, chdir: @config["source"])
       end
 
       private
 
       def tailwind_content
-        "@import '#{tailwind_css_path}';"
-      end
-
-      def tailwind_css_path
-        @config.dig("tailwindcss", "css_path") || "./_tailwind.css"
-      end
-
-      def valid_tailwindcss_gem_version?
-        gem_spec = Gem.loaded_specs["tailwindcss-ruby"]
-        return false unless gem_spec
-
-        Gem::Version.new(gem_spec.version) >= Gem::Version.new("4.0.0")
-      rescue
-        # If anything goes wrong (gem not found, version format issues, etc.)
-        false
+        path = ::Jekyll::Tailwindcss.css_path(@config).gsub(/["\\]/) { |c| "\\#{c}" }
+        "@import \"#{path}\";"
       end
 
       def tailwind_v3_message
@@ -49,7 +36,8 @@ module Jekyll
           You're using a .tailwindcss file extension, but your tailwindcss-ruby gem is below version 4.0.
           The .tailwindcss extension is only supported in v4.0.0 and above. Please either:
             - Upgrade with: bundle update tailwindcss-ruby
-            - Rename your file to use .css extension with @import "tailwindcss" syntax
+            - Stay on v3 with a .css file and tailwind.config.js, as described in the README's "Tailwind Version 3 Setup" section:
+              https://github.com/vormwald/jekyll-tailwindcss#optional-choosing-a-specific-version-of-tailwindcss
         MESSAGE
       end
     end

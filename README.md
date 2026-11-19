@@ -127,6 +127,22 @@ tailwindcss:
 
 > See an example repo at https://github.com/vormwald/jekyll-blahg
 
+### Quick start
+
+With Tailwind v4 (tailwindcss-ruby >= 4.0) and the gem in your Gemfile's `:jekyll_plugins` group (see [Installation](#installation)), run:
+
+```sh
+bundle exec jekyll tailwindcss:install
+```
+
+This creates `_tailwind.css` (or your `tailwindcss.css_path`) and `assets/css/styles.tailwindcss`, skipping any that already exist. Then add the stylesheet to your layout's `<head>`:
+
+```html
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+```
+
+The command doesn't support Tailwind v3. For v3, follow the [Tailwind Version 3 Setup](#optional-choosing-a-specific-version-of-tailwindcss).
+
 ### Setup
 You'll need 2 files to make this work:
 
@@ -160,7 +176,7 @@ This file is just a placeholder. Its content will be replaced by output from the
 > This is a compromise to allow the [TailwindCSS intellisense](https://tailwindcss.com/docs/editor-setup#intellisense-for-vs-code) plugin to work. (It cannot parse a CSS file with frontmatter, so we keep it separate)
 >
 > The `_tailwind.css` file serves as the tailwindcss config file.
-> If you'd rather keep this file somewhere else, you can do so by setting the `tailwindcss.css_path` option in `_config.yml`:
+> If you'd rather keep this file somewhere else, you can do so by setting the `tailwindcss.css_path` option in `_config.yml`. A relative path is resolved against your site source, not the directory you run `jekyll` from (before 0.8.0 it was the latter, so drop any `src/`-style prefix you added for `source:`):
 >
 > ```yaml
 > tailwindcss:

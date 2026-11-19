@@ -86,6 +86,16 @@ RSpec.describe Jekyll::Tailwindcss::Commands do
       end
     end
 
+    context "when chdir is given" do
+      it "runs the CLI in that directory" do
+        expect(Open3).to receive(:capture3)
+          .with(described_class::ENV_OPTIONS, *command, stdin_data: content, binmode: true, chdir: "/srv/site")
+          .and_return([stdout, stderr, status])
+
+        expect(described_class.compile(content, chdir: "/srv/site")).to eq(stdout)
+      end
+    end
+
     context "when the CLI exits with a nonzero status" do
       let(:exitstatus) { 1 }
       let(:stdout) { +"" }

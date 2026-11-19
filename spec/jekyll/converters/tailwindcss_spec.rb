@@ -4,8 +4,9 @@ require "spec_helper"
 
 RSpec.describe Jekyll::Converters::Tailwindcss do
   subject(:converter) do
-    described_class.new(Jekyll::Configuration::DEFAULTS.merge(plugin_config))
+    described_class.new(Jekyll::Configuration::DEFAULTS.merge("source" => source).merge(plugin_config))
   end
+  let(:source) { "/srv/site" }
   let(:plugin_config) { {} }
 
   before do
@@ -38,8 +39,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
   end
 
   describe "#convert" do
-    let(:css_path) { "./_tailwind.css" }
-    let(:tailwind_input) { "@import '#{css_path}';" }
+    let(:tailwind_input) { '@import "/srv/site/_tailwind.css";' }
     let(:tailwind_output) { "body { color: red; }" }
     let(:ignored_content_input) { "This is ignored" }
 
@@ -54,7 +54,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
       it "calls the tailwindcss CLI" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
         expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
-          .with(tailwind_input, debug: true)
+          .with(tailwind_input, debug: true, chdir: source)
           .and_return(tailwind_output)
 
         expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
@@ -69,15 +69,41 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
           }
         }
       end
-      let(:tailwind_input) { "@import '_data/other_tailwind_file.css';" }
+      let(:tailwind_input) { '@import "/srv/site/_data/other_tailwind_file.css";' }
 
-      it "passes the config path to the tailwindcss CLI" do
+      it "imports the configured path, resolved against the site source" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating CSS")
         expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
-          .with(tailwind_input, debug: true)
+          .with(tailwind_input, debug: true, chdir: source)
           .and_return(tailwind_output)
 
         expect(converter.convert(ignored_content_input)).to eq(tailwind_output)
+      end
+    end
+
+    context "when css_path is absolute" do
+      let(:plugin_config) { {"tailwindcss" => {"css_path" => "/elsewhere/tailwind.css"}} }
+      let(:tailwind_input) { '@import "/elsewhere/tailwind.css";' }
+
+      it "imports it unchanged" do
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwind_input, debug: true, chdir: source)
+          .and_return(tailwind_output)
+
+        converter.convert(ignored_content_input)
+      end
+    end
+
+    context "when the path contains a double quote" do
+      let(:source) { '/srv/my "site"' }
+      let(:tailwind_input) { '@import "/srv/my \\"site\\"/_tailwind.css";' }
+
+      it "escapes it in the import" do
+        expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
+          .with(tailwind_input, debug: true, chdir: source)
+          .and_return(tailwind_output)
+
+        converter.convert(ignored_content_input)
       end
     end
 
@@ -99,6 +125,13 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
         expect { converter.convert(ignored_content_input) }
           .to raise_error(Jekyll::Tailwindcss::CompilationError, /tailwindcss-ruby gem is below version 4.0/)
       end
+
+      it "points at the README's v3 setup instead of v4 syntax" do
+        expect { converter.convert(ignored_content_input) }
+          .to raise_error(Jekyll::Tailwindcss::CompilationError, /Tailwind Version 3 Setup/) { |e|
+            expect(e.message).not_to include('@import "tailwindcss"')
+          }
+      end
     end
 
     context "when not in development mode" do
@@ -107,7 +140,7 @@ RSpec.describe Jekyll::Converters::Tailwindcss do
       it "includes the --minify option" do
         expect(Jekyll.logger).to receive(:info).with("Jekyll Tailwind:", "Generating minified CSS")
         expect(Jekyll::Tailwindcss::Commands).to receive(:compile)
-          .with(tailwind_input, debug: false)
+          .with(tailwind_input, debug: false, chdir: source)
           .and_return(tailwind_output)
 
         expect(converter.convert(ignored_content_input)).to eq(tailwind_output)

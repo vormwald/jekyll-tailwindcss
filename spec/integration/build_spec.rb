@@ -64,6 +64,34 @@ RSpec.describe "building a Jekyll site with the real tailwindcss CLI" do
       expect(generated_css).to match(/text-center/)
     end
 
+    it "resolves relative @imports inside _tailwind.css against that file" do
+      generated_css = build_site(cwd: ".") do |source|
+        FileUtils.mkdir_p(File.join(source, "partials"))
+        File.write(File.join(source, "partials", "brand.css"), ".brand-from-partial { color: rebeccapurple; }\n")
+        File.write(File.join(source, "_tailwind.css"), <<~CSS)
+          @import "tailwindcss";
+          @import "./partials/brand.css";
+        CSS
+      end
+
+      expect(generated_css).to match(/text-center/)
+      expect(generated_css).to include(".brand-from-partial")
+    end
+
+    it "resolves relative @imports next to a css_path in a subdirectory" do
+      generated_css = build_site(cwd: ".") do |source|
+        FileUtils.mkdir_p(File.join(source, "_css"))
+        File.write(File.join(source, "_css", "brand.css"), ".brand-from-partial { color: rebeccapurple; }\n")
+        File.write(File.join(source, "_css", "tailwind.css"), <<~CSS)
+          @import "tailwindcss";
+          @import "./brand.css";
+        CSS
+        File.write(File.join(source, "_config.yml"), "tailwindcss:\n  css_path: _css/tailwind.css\n", mode: "a")
+      end
+
+      expect(generated_css).to include(".brand-from-partial")
+    end
+
     it "resolves a custom css_path against the site source" do
       generated_css = build_site(cwd: ".") do |source|
         FileUtils.mkdir_p(File.join(source, "_data"))

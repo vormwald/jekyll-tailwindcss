@@ -10,7 +10,10 @@ RSpec.describe "building a Jekyll site with the real tailwindcss CLI" do
 
   # Builds a throwaway copy of the fixture site and returns the generated CSS.
   # The block, if given, can modify the copied source before the build.
-  def build_site(quiet: true)
+  # `cwd` is the directory to build from, relative to the temp dir. The default
+  # is the site source; "." builds the way `jekyll build --source site` would
+  # from its parent.
+  def build_site(quiet: true, cwd: "site")
     Dir.mktmpdir do |tmp|
       # Build from a throwaway copy of the fixture: Jekyll writes its disk cache
       # (.jekyll-cache) under the site source, so building in place would leave
@@ -20,10 +23,8 @@ RSpec.describe "building a Jekyll site with the real tailwindcss CLI" do
       FileUtils.cp_r(fixture_source, source)
       yield source if block_given?
 
-      # The plugin resolves the tailwind css config path (default "./_tailwind.css")
-      # relative to the process working directory rather than the site source,
-      # so the site being built must be the cwd for the build to find it.
-      Dir.chdir(source) do
+      FileUtils.mkdir_p(File.join(tmp, cwd))
+      Dir.chdir(File.join(tmp, cwd)) do
         config = Jekyll.configuration(
           "source" => source,
           "destination" => destination,
@@ -46,6 +47,60 @@ RSpec.describe "building a Jekyll site with the real tailwindcss CLI" do
 
     expect(generated_css).not_to be_empty
     expect(generated_css).to match(/text-center/)
+  end
+
+  context "when building from outside the site source" do
+    it "finds _tailwind.css and the classes in the site's templates" do
+      generated_css = build_site(cwd: ".")
+
+      expect(generated_css).to match(/text-center/)
+    end
+
+    it "scans the site's templates even when the cwd doesn't contain them" do
+      # Tailwind detects classes from its working directory, so this only
+      # passes if the CLI runs in the site source.
+      generated_css = build_site(cwd: "unrelated")
+
+      expect(generated_css).to match(/text-center/)
+    end
+
+    it "resolves relative @imports inside _tailwind.css against that file" do
+      generated_css = build_site(cwd: ".") do |source|
+        FileUtils.mkdir_p(File.join(source, "partials"))
+        File.write(File.join(source, "partials", "brand.css"), ".brand-from-partial { color: rebeccapurple; }\n")
+        File.write(File.join(source, "_tailwind.css"), <<~CSS)
+          @import "tailwindcss";
+          @import "./partials/brand.css";
+        CSS
+      end
+
+      expect(generated_css).to match(/text-center/)
+      expect(generated_css).to include(".brand-from-partial")
+    end
+
+    it "resolves relative @imports next to a css_path in a subdirectory" do
+      generated_css = build_site(cwd: ".") do |source|
+        FileUtils.mkdir_p(File.join(source, "_css"))
+        File.write(File.join(source, "_css", "brand.css"), ".brand-from-partial { color: rebeccapurple; }\n")
+        File.write(File.join(source, "_css", "tailwind.css"), <<~CSS)
+          @import "tailwindcss";
+          @import "./brand.css";
+        CSS
+        File.write(File.join(source, "_config.yml"), "tailwindcss:\n  css_path: _css/tailwind.css\n", mode: "a")
+      end
+
+      expect(generated_css).to include(".brand-from-partial")
+    end
+
+    it "resolves a custom css_path against the site source" do
+      generated_css = build_site(cwd: ".") do |source|
+        FileUtils.mkdir_p(File.join(source, "_data"))
+        FileUtils.mv(File.join(source, "_tailwind.css"), File.join(source, "_data", "tailwind.css"))
+        File.write(File.join(source, "_config.yml"), "tailwindcss:\n  css_path: ./_data/tailwind.css\n", mode: "a")
+      end
+
+      expect(generated_css).to match(/text-center/)
+    end
   end
 
   context "when the locale is not UTF-8" do

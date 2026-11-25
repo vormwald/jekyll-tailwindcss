@@ -127,6 +127,22 @@ tailwindcss:
 
 > See an example repo at https://github.com/vormwald/jekyll-blahg
 
+### Quick start
+
+With Tailwind v4 (tailwindcss-ruby >= 4.0) and the gem in your Gemfile's `:jekyll_plugins` group (see [Installation](#installation)), run:
+
+```sh
+bundle exec jekyll tailwindcss:install
+```
+
+This creates `_tailwind.css` (or your `tailwindcss.css_path`) and `assets/css/styles.tailwindcss`, skipping any that already exist. Then add the stylesheet to your layout's `<head>`:
+
+```html
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+```
+
+The command doesn't support Tailwind v3. For v3, follow the [Tailwind Version 3 Setup](#optional-choosing-a-specific-version-of-tailwindcss).
+
 ### Setup
 You'll need 2 files to make this work:
 

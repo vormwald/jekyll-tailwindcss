@@ -1,4 +1,5 @@
 ## [Unreleased]
+- Add `jekyll tailwindcss:install`, which creates `_tailwind.css` (or your `tailwindcss.css_path`) and `assets/css/styles.tailwindcss`, skips files that already exist, and prints the `<link>` tag to add to your layout. Requires tailwindcss-ruby >= 4.0. [#31](https://github.com/vormwald/jekyll-tailwindcss/pull/31)
 - **Breaking:** Tailwind failures now fail the Jekyll build. A missing tailwindcss binary, a CLI error, a v3 stylesheet without a `tailwindcss.config` path, or a `.tailwindcss` file on tailwindcss-ruby < 4 raises `Jekyll::Tailwindcss::CompilationError`, and `jekyll build` exits non-zero. Previously the gem logged the error and published the uncompiled source.
 - Drop support for Ruby 3.1, which reached end-of-life on 2025-03-31. The gem now requires Ruby >= 3.2.
 - Fix CSS compilation failing with `invalid byte sequence in US-ASCII` on build machines without a UTF-8 locale (e.g. `LANG=C`). The tailwindcss CLI's input and output are now always handled as UTF-8. [#36](https://github.com/vormwald/jekyll-tailwindcss/issues/36)
